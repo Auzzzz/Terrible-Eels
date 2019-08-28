@@ -1,0 +1,50 @@
+package model.constraints;
+
+import enums.Gender;
+import interfaces.Student;
+import interfaces.Project;
+
+/**
+ * Hard constraint: no more than 1 female student is placed in one team
+ */
+public class GenderConstraint extends AbstractConstraint {
+	public GenderConstraint(String description) {
+		super(description);
+	}
+
+	private boolean teamContainsFemale(Project project) {
+		for (Student member : project.getMembers()) {
+			if (member.getGender() == Gender.FEMALE) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean validate(Project project, Student student) {
+		if (student.getGender() == Gender.FEMALE) {
+			return !teamContainsFemale(project);
+		}
+		
+		return true;
+	}
+	
+	@Override
+	public boolean validate(Project project) {
+		boolean hasFemale = false;
+		
+		for (Student member : project.getMembers()) {
+			if (member.getGender() == Gender.FEMALE) {
+				if (hasFemale) {
+					return false;
+				} else {
+					hasFemale = true;
+				}
+			}
+		}
+		
+		return true;
+	}
+}
