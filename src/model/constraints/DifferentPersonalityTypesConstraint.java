@@ -18,7 +18,7 @@ public class DifferentPersonalityTypesConstraint extends SoftConstraint {
 	
 	@Override
 	public boolean validate(Project project, Student student) {
-		List<Student> members = project.getMembers();
+		List<Student> members = project.getStudents();
 		PersonalityType studentType = student.getPersonalityType();
 
 		for (Student member : members) {
@@ -34,7 +34,7 @@ public class DifferentPersonalityTypesConstraint extends SoftConstraint {
 	public boolean validate(Project project) {
 		Set<PersonalityType> types = new HashSet<>(); 
 		
-		for (Student member : project.getMembers()) {
+		for (Student member : project.getStudents()) {
 			PersonalityType type = member.getPersonalityType();
 						
 			if (types.contains(type)) {

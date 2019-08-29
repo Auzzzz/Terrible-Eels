@@ -13,7 +13,7 @@ public class GenderConstraint extends AbstractConstraint {
 	}
 
 	private boolean teamContainsFemale(Project project) {
-		for (Student member : project.getMembers()) {
+		for (Student member : project.getStudents()) {
 			if (member.getGender() == Gender.FEMALE) {
 				return true;
 			}
@@ -35,7 +35,7 @@ public class GenderConstraint extends AbstractConstraint {
 	public boolean validate(Project project) {
 		boolean hasFemale = false;
 		
-		for (Student member : project.getMembers()) {
+		for (Student member : project.getStudents()) {
 			if (member.getGender() == Gender.FEMALE) {
 				if (hasFemale) {
 					return false;
