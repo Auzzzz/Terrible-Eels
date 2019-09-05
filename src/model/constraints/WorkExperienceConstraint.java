@@ -26,7 +26,7 @@ public class WorkExperienceConstraint extends SoftConstraint {
 	
 	@Override
 	public boolean validate(Project project) {
-		List<Student> students = project.getStudents();
+		List<Student> students = (List<Student>)project.getStudents();
 		
 		for (Student member : students) {
 			if (member.getGpa() >= EXPERIENCE) {

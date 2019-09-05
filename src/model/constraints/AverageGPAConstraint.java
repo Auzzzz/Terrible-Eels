@@ -37,7 +37,7 @@ public class AverageGPAConstraint extends AbstractConstraint {
 	
 	@Override
 	public boolean validate(Project project, Student student) {
-		List<Student> members = project.getStudents();
+		List<Student> members = (List<Student>) project.getStudents();
 		int count = members.size();
 		
 		// if there are two members or less, then new member can be added regardless
@@ -60,7 +60,7 @@ public class AverageGPAConstraint extends AbstractConstraint {
 	
 	@Override
 	public boolean validate(Project project) {
-		double averageGPA = calculateAverageGPA(project.getStudents());
+		double averageGPA = calculateAverageGPA((List<Student>) project.getStudents());
 		
 		return (averageGPA >= this.averageGPA) ? false : true;
 	}

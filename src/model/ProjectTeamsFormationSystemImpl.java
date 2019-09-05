@@ -44,8 +44,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		Project project2 = connection.getProject(s2);
 		
 		// create temporary teams
-		Project temp1 = new ProjectImpl();	// TODO: ProjectImpl constructor parameters
-		Project temp2 = new ProjectImpl();
+		Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<Role>());	// TODO: ProjectImpl constructor parameters
+		Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<Role>());
 		temp1.addStudent(s2);
 		temp2.addStudent(s1);
 		

@@ -1,6 +1,6 @@
 package interfaces;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface Project {
 	static final int TEAM_CAPACITY = 4;
@@ -9,7 +9,7 @@ public interface Project {
 	
 	String getProjectDesc();
 	
-	List<Student> getStudents();
+	Collection<Student> getStudents();
 	
 	void addStudent(Student student);
 	
