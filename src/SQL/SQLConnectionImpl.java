@@ -1,11 +1,13 @@
 package SQL;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import interfaces.Constraint;
 import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
+import model.ProjectImpl;
 import model.constraints.SoftConstraint;
 
 public class SQLConnectionImpl implements SQLConnection {
@@ -15,11 +17,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection("jdbc:sqlite:db/SEF.db");
-			
-			// change made
-//			String url = "jdbc:mysql://localhost:3306/sef";
-//			Connection conn = DriverManager.getConnection(url, "root", "");
-			
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
@@ -90,10 +87,55 @@ public class SQLConnectionImpl implements SQLConnection {
 		return null;
 	}
 
+	private List<String> getPopularProjectIds(int popularProjectCounts) {
+		List<String> projectIds = new ArrayList<>();
+		//String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + popularProjectCounts + ";";
+		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT 10;";
+		
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+	    	
+	    	while(rs.next()) {
+	    		projectIds.add(rs.getString(1));
+			}	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+		return projectIds;
+	}
+	
+	private Project getProject(String projectId) {
+		String query = "SELECT * FROM Project WHERE ProID = " + projectId + ";";
+		
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+	    	
+	    	if (rs.next()) {
+	    		Project project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
+	    		return project;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public List<Project> getPopularProjects(int popularProjectCounts) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Project> projects = new ArrayList<>();
+		
+		List<String> projectIds = getPopularProjectIds(popularProjectCounts);
+		
+		for (String projectId : projectIds) {
+			Project project = getProject(projectId); 
+			projects.add(project);
+		}
+		
+		return projects;
 	}
 
 	@Override
