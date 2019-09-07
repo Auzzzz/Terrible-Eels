@@ -3,11 +3,10 @@ package model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-
 import interfaces.Project;
 import interfaces.Role;
 import interfaces.Student;
+import model.constraints.AverageGPAConstraint;
 
 public class ProjectImpl implements Project {
 
@@ -15,14 +14,18 @@ public class ProjectImpl implements Project {
 	ArrayList<Role> rolesReq = new ArrayList<Role>();
 	String projectId;
 	String description;
-	
+
+	//Testing constructor
+	public ProjectImpl() {
+		
+	}
 	
 	public ProjectImpl(String projectId, String description, Collection<Role> roles) {
 		this.projectId = projectId;
 		this.description = description;
 		this.rolesReq = (ArrayList<Role>) roles;
 	}
-	
+
 	@Override
 	public String getId() {
 		return projectId;
@@ -42,7 +45,7 @@ public class ProjectImpl implements Project {
 	public boolean removeStudent(Student student) {
 		return students.remove(student.getId(), student);
 	}
-	
+
 	@Override
 	public int calculateFit() {
 		// TODO Auto-generated method stub
@@ -51,7 +54,15 @@ public class ProjectImpl implements Project {
 
 	@Override
 	public void addStudent(Student student) {
-		students.put(student.getId(), student);
+		if (validateAdd(student)) {
+			students.put(student.getId(), student);
+		}
 	}
-	
+
+	private boolean validateAdd(Student student) {
+		/*if(AverageGPAConstraint.validate(this, student)) {
+			return true;
+		}*/
+		return false;
+	}
 }

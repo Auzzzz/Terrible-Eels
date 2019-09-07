@@ -11,7 +11,7 @@ public abstract class AbstractConstraint implements Constraint {
 		this.description = description;
 	}
 	
-	public void setDescriotion(String description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 	
