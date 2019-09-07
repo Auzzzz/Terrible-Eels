@@ -6,7 +6,7 @@ import enums.Gender;
 import enums.PersonalityType;
 
 public interface Student {
-	String getId();
+	String getStudentNo();
 	
 	String getName();
 	

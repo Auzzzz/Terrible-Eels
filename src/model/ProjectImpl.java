@@ -43,7 +43,7 @@ public class ProjectImpl implements Project {
 
 	@Override
 	public boolean removeStudent(Student student) {
-		return students.remove(student.getId(), student);
+		return students.remove(student.getStudentNo(), student);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class ProjectImpl implements Project {
 	@Override
 	public void addStudent(Student student) {
 		if (validateAdd(student)) {
-			students.put(student.getId(), student);
+			students.put(student.getStudentNo(), student);
 		}
 	}
 
