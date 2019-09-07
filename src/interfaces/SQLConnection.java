@@ -21,7 +21,7 @@ public interface SQLConnection {
 	
 	List<Student> getMaleStudents();
 	
-	List<Project> getPopularProjects(int popularProjectCounts);
+	List<Project> getPopularProjects(int idealNumberOfProjects);
 	
 	Project getProject(Student student);
 	

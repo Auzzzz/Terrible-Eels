@@ -43,35 +43,37 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		Project project1 = connection.getProject(s1);
 		Project project2 = connection.getProject(s2);
 		
-		// create temporary teams
-		Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<Role>());	// TODO: ProjectImpl constructor parameters
-		Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<Role>());
-		temp1.addStudent(s2);
-		temp2.addStudent(s1);
-		
-		for (Student student : project1.getStudents()) {
-			// TODO: student overrides equals accordingly?
-			if (!(student.equals(s1))) {
-				temp1.addStudent(student);
-			}
-		}
-		
-		for (Student student : project2.getStudents()) {
-			if (!(student.equals(s2))) {
-				temp2.addStudent(student);
-			}
-		}
-		
-		if ((temp1.calculateFit() >= acceptableChange) && (temp2.calculateFit() >= acceptableChange)) {
-			project1.removeStudent(s1);
-			project1.addStudent(s2);
-			project2.removeStudent(s2);
-			project2.addStudent(s1);
+		if (!((project1.getId()).equals(project2.getId()))) {
+			// create temporary teams
+			Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<Role>());
+			Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<Role>());
 			
-			connection.updateProject(project1);
-			connection.updateProject(project2);
+			temp1.addStudent(s2);
+			temp2.addStudent(s1);
 			
-			return true;
+			for (Student student : project1.getStudents()) {
+				if (!((student.getStudentNo()).equals(s1.getStudentNo()))) {
+					temp1.addStudent(student);
+				}
+			}
+			
+			for (Student student : project2.getStudents()) {
+				if (!((student.getStudentNo()).equals(s2.getStudentNo()))) {
+					temp2.addStudent(student);
+				}
+			}
+			
+			if ((temp1.calculateFit() >= acceptableChange) && (temp2.calculateFit() >= acceptableChange)) {
+				project1.removeStudent(s1);
+				project1.addStudent(s2);
+				project2.removeStudent(s2);
+				project2.addStudent(s1);
+				
+				connection.updateProject(project1);
+				connection.updateProject(project2);
+				
+				return true;
+			}
 		}
 		
 		return false;

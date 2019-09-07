@@ -114,6 +114,7 @@ public class SQLConnectionImpl implements SQLConnection {
 			ResultSet rs = state.executeQuery(query);
 	    	
 	    	if (rs.next()) {
+	    		// TODO: need roles in database
 	    		Project project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
 	    		return project;
 			}
@@ -125,10 +126,9 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 	
 	@Override
-	public List<Project> getPopularProjects(int popularProjectCounts) {
+	public List<Project> getPopularProjects(int idealNumberOfProjects) {
 		List<Project> projects = new ArrayList<>();
-		
-		List<String> projectIds = getPopularProjectIds(popularProjectCounts);
+		List<String> projectIds = getPopularProjectIds(idealNumberOfProjects);
 		
 		for (String projectId : projectIds) {
 			Project project = getProject(projectId); 

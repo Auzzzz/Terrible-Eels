@@ -14,11 +14,6 @@ public class ProjectImpl implements Project {
 	ArrayList<Role> rolesReq = new ArrayList<Role>();
 	String projectId;
 	String description;
-
-	//Testing constructor
-	public ProjectImpl() {
-		
-	}
 	
 	public ProjectImpl(String projectId, String description, Collection<Role> roles) {
 		this.projectId = projectId;
