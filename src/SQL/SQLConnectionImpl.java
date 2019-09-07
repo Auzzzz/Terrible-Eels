@@ -9,11 +9,24 @@ import interfaces.Student;
 import model.constraints.SoftConstraint;
 
 public class SQLConnectionImpl implements SQLConnection {
-
-	public static void main(String[] args) {
+	private static Connection conn = null;
+	
+	public SQLConnectionImpl()  {
 		try {
-			String url = "jdbc:mysql://localhost:3306/sef";
-			Connection conn = DriverManager.getConnection(url, "root", "");
+			Class.forName("org.sqlite.JDBC");
+			conn = DriverManager.getConnection("jdbc:sqlite:db/SEF.db");
+			
+			// change made
+//			String url = "jdbc:mysql://localhost:3306/sef";
+//			Connection conn = DriverManager.getConnection(url, "root", "");
+			
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void getStudent() {
+		try {
 			Statement stmt = conn.createStatement();
 			ResultSet rs;
 
