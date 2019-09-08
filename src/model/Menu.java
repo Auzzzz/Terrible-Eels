@@ -1,29 +1,42 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
+import java.util.Scanner;
+import SQL.SQLConnectionImpl;
+import interfaces.ProjectTeamsFormationSystem;
+import interfaces.SQLConnection;
 
 public class Menu {
 
-	 public static void main  (String[] args) throws IOException {
-	        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-	        System.out.println("Hit 1 to Add Studnet to DB ");
-	        System.out.println("Hit 2 to Add Student to a Team ");
-	        System.out.println("Hit 3 to Change a students Personality");
+	public void run() {
+		SQLConnection SQL = new SQLConnectionImpl();
+		ProjectTeamsFormationSystem system = new ProjectTeamsFormationSystemImpl(SQL);
+		Scanner scanner = new Scanner(System.in);
+		String input = "";
 
-	        int buttonCode = bufferRead.read();
-	        //Button Codes for 1, 2 and 3 keys are 49, 50 and 51 respectively
+		while (input != "1") {
+			System.out.println("Press 1 to Display All Projects ");
+			System.out.println("Press 2 to Display Popular Projects ");
+			System.out.println("Press 3 to exit");
 
-	        
-	        if (buttonCode==49) {
-	        	System.out.println("Add stuent to Database");
-	        } else if(buttonCode==50) {
-	        	System.out.println("Add Student to a Team");
-	        } else if (buttonCode==51) {
-	        	System.out.println("Change Student Personality");
-	        } else {
-	            System.out.println("Wrong button pressed");
-	        }
-	    }
+			input = scanner.nextLine();
+
+			switch (input) {
+			case "1":
+				System.out.println(system.getAllProjectDescs());
+				break;
+			case "2":
+				System.out.println(system.getPopularProjectDescs());
+				break;
+			default:
+				System.out.println("Wrong button pressed, please try again.");
+				break;
+
+			}
+			
+			scanner.close();
+
+		}
+
+	}
 }
