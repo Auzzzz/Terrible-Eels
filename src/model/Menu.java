@@ -1,6 +1,5 @@
 package model;
 
-
 import java.util.Scanner;
 import SQL.SQLConnectionImpl;
 import interfaces.ProjectTeamsFormationSystem;
@@ -14,28 +13,44 @@ public class Menu {
 		Scanner scanner = new Scanner(System.in);
 		String input = "";
 
-		while (input != "1") {
-			System.out.println("Press 1 to Display All Projects ");
-			System.out.println("Press 2 to Display Popular Projects ");
-			System.out.println("Press 3 to exit");
-
+		System.out.println("Please enter student, client, or project manager:");
+		input = scanner.nextLine().toLowerCase();
+		switch (input) {
+		case "student":
+			System.out.println("Not yet implemented");
+			break;
+		case "client":
+			System.out.println("Not yet implemented");
+			break;
+		case "project manager":
+			System.out.println("Please Enter Username:");
+			input = scanner.nextLine();
+			System.out.println("Please Enter Password:");
 			input = scanner.nextLine();
 
-			switch (input) {
-			case "1":
-				System.out.println(system.getAllProjectDescs());
-				break;
-			case "2":
-				System.out.println(system.getPopularProjectDescs());
-				break;
-			default:
-				System.out.println("Wrong button pressed, please try again.");
-				break;
+			while (input != "1") {
+				System.out.println("Press 1 to Display All Projects ");
+				System.out.println("Press 2 to Display Popular Projects ");
+				System.out.println("Press 3 to exit");
 
+				input = scanner.nextLine();
+
+				switch (input) {
+				case "1":
+					System.out.println(system.getAllProjectDescs());
+					break;
+				case "2":
+					System.out.println(system.getPopularProjectDescs());
+					break;
+				default:
+					System.out.println("Wrong button pressed, please try again.");
+					break;
+
+				}
+
+				scanner.close();
+				break;
 			}
-			
-			scanner.close();
-
 		}
 
 	}
