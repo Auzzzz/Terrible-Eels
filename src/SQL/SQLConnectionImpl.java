@@ -59,8 +59,23 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public List<Project> getAllProjects() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Project> projects = new ArrayList<>();
+		String query = "SELECT * FROM Project;";
+		
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+	    	
+	    	while (rs.next()) {
+	    		Project project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
+	    		projects.add(project);
+	    		
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return projects;
 	}
 
 	@Override
