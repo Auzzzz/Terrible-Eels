@@ -168,4 +168,10 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		List<Student> unassigned = assignStudents(femaleStudents, popularProjects);
 		unassigned.addAll(assignStudents(maleStudents, popularProjects));
 	}
+
+	@Override
+	public List<Project> getUnPopularProjects() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
