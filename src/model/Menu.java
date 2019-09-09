@@ -18,10 +18,10 @@ public class Menu {
 		switch (input) {
 		case "student":
 			System.out.println("Not yet implemented");
-			break;
+			run();
 		case "client":
 			System.out.println("Not yet implemented");
-			break;
+			run();
 		case "project manager":
 			System.out.println("Please Enter Username:");
 			input = scanner.nextLine();
