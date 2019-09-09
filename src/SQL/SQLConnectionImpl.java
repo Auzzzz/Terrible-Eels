@@ -176,4 +176,20 @@ public class SQLConnectionImpl implements SQLConnection {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public List<Project> getUnPopularProjects() {
+		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT 10;";
+		
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+	    	
+	 	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+		return null;
+	}
 }
