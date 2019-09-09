@@ -22,9 +22,7 @@ public interface SQLConnection {
 	List<Student> getMaleStudents();
 	
 	List<Project> getPopularProjects(int idealNumberOfProjects);
-	
-	List<Project> getUnPopularProjects();
-	
+		
 	Project getProject(Student student);
 	
 	void updateProject(Project project);
