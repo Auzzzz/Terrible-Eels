@@ -41,7 +41,19 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public int getStudentCount() {
-		// TODO Auto-generated method stub
+		String query = "SELECT COUNT(StuID) FROM Student;";
+		
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+	    	
+	    	if (rs.next()) {
+	    		return rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return 0;
 	}
 
@@ -104,8 +116,8 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	private List<String> getPopularProjectIds(int popularProjectCounts) {
 		List<String> projectIds = new ArrayList<>();
-		//String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + popularProjectCounts + ";";
-		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT 10;";
+		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + popularProjectCounts + ";";
+//		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT 10;";
 		
 		try {
 			Statement state = conn.createStatement();
