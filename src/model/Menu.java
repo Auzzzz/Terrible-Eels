@@ -19,9 +19,11 @@ public class Menu {
 		case "student":
 			System.out.println("Not yet implemented");
 			run();
+			break;
 		case "client":
 			System.out.println("Not yet implemented");
 			run();
+			break;
 		case "project manager":
 			System.out.println("Please Enter Username:");
 			input = scanner.nextLine();
