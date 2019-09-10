@@ -14,6 +14,4 @@ public interface Project {
 	void addStudent(Student student);
 	
 	boolean removeStudent(Student student);
-	
-	int calculateFit();
 }

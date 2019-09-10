@@ -42,6 +42,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	public boolean swap(Student s1, Student s2, int acceptableChange) {
 		Project project1 = connection.getProject(s1);
 		Project project2 = connection.getProject(s2);
+		Validator validator = new ValidatorImpl();
 		
 		if (!((project1.getId()).equals(project2.getId()))) {
 			// create temporary teams
@@ -63,7 +64,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				}
 			}
 			
-			if ((temp1.calculateFit() >= acceptableChange) && (temp2.calculateFit() >= acceptableChange)) {
+			if ((validator.calculateFit(temp1) >= acceptableChange) && (validator.calculateFit(temp2) >= acceptableChange)) {
 				project1.removeStudent(s1);
 				project1.addStudent(s2);
 				project2.removeStudent(s2);

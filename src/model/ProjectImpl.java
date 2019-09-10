@@ -42,12 +42,6 @@ public class ProjectImpl implements Project {
 	}
 
 	@Override
-	public int calculateFit() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void addStudent(Student student) {
 		if (validateAdd(student)) {
 			students.put(student.getStudentNo(), student);
