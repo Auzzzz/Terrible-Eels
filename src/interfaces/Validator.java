@@ -9,4 +9,6 @@ public interface Validator {
 	Collection<String> getAllConstraintDesc();
 	
 	Constraint getConstraint(String desc);
+	
+	boolean validateHardConstraints(Project project, Student student);
 }

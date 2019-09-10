@@ -8,9 +8,11 @@ import interfaces.*;
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
 	private SQLConnection connection;
+	private Validator validator;
 	
 	public ProjectTeamsFormationSystemImpl(SQLConnection connection) {
 		this.connection = connection;
+		this.validator = new ValidatorImpl(connection);
 	}
 	
 	public List<String> getAllProjectDescs() {
@@ -42,7 +44,6 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	public boolean swap(Student s1, Student s2, int acceptableChange) {
 		Project project1 = connection.getProject(s1);
 		Project project2 = connection.getProject(s2);
-		Validator validator = new ValidatorImpl();
 		
 		if (!((project1.getId()).equals(project2.getId()))) {
 			// create temporary teams
@@ -86,7 +87,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	 * @param popularProjects
 	 * @return - project object of the list that was found
 	 */
-	private Project findProject(String projectId, List<Project> popularProjects) {
+	private Project isPopularProject(String projectId, List<Project> popularProjects) {
 		for (Project project : popularProjects) {
 			if (projectId.equals(project.getId())) {
 				return project;
@@ -108,7 +109,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		for (String preference : preferences) {			
 			
 			// find the preferred 'popular project' object 
-			Project project = findProject(preference, popularProjects);
+			Project project = isPopularProject(preference, popularProjects);
 			
 			// the preferred project is popular enough
 			if (project != null) {
@@ -117,17 +118,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				// if the project has no member yet
 				if (project.getStudents().isEmpty()) {
 					valid = true;
-					
 				} else {
-					// if adding the student violates any hard constraint he cannot join the project
-					for (Constraint constraint : connection.getAllHardConstraints()) {
-						if (constraint.validate(project, student)) {
-							valid = true;
-						} else {
-							valid = false;
-							break;
-						}
-					}
+					valid = validator.validateHardConstraints(project, student);
 				}
 				
 				if (valid) {
