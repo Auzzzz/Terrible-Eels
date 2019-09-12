@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import enums.Role;
 import interfaces.*;
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
@@ -15,6 +16,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		this.validator = new ValidatorImpl(connection);
 	}
 	
+	@Override
 	public List<String> getAllProjectDescs() {
 		List<String> projectDescs = new ArrayList<>();
 		
@@ -25,12 +27,14 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return projectDescs;
 	}
 	
+	@Override
 	public List<Project> getPopularProjects() {
 		int idealNumberOfProjects = (connection.getStudentCount() / Project.TEAM_CAPACITY);
 		
 		return connection.getPopularProjects(idealNumberOfProjects);
 	}
 	
+	@Override
 	public List<String> getPopularProjectDescs() {
 		List<String> projectDescs = new ArrayList<>();
 		
@@ -41,6 +45,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return projectDescs;
 	}
 	
+	@Override
 	public boolean swap(Student s1, Student s2, int acceptableChange) {
 		Project project1 = connection.getProject(s1);
 		Project project2 = connection.getProject(s2);
@@ -71,8 +76,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				project2.removeStudent(s2);
 				project2.addStudent(s1);
 				
-				connection.updateProject(project1);
-				connection.updateProject(project2);
+				connection.saveProject(project1);
+				connection.saveProject(project2);
 				
 				return true;
 			}
@@ -119,12 +124,12 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				if (project.getStudents().isEmpty()) {
 					valid = true;
 				} else {
-					valid = validator.validateHardConstraints(project, student);
+					valid = validator.validateRequirements(project, student);
 				}
 				
 				if (valid) {
 					project.addStudent(student);
-					connection.updateProject(project);
+					connection.saveProject(project);
 					
 					return true;
 				}
@@ -150,7 +155,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	// Assign students into teams based on preferences and constraints
-	public void assign() {
+	@Override
+	public void assignStudents() {
 		// popular projects to which students can be assigned
 		List<Project> popularProjects = getPopularProjects();
 		

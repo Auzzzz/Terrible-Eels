@@ -43,4 +43,21 @@ public class ValidatorImpl implements Validator {
 		}
 		return true;
 	}
+	
+	@Override
+	public boolean validateRolesAndSkills(Project project, Student student) {
+		// get required role and skills from project
+		// get preferred role and skills from student
+		
+		// for each required role and skills of project
+		// check if they match to student's skill
+		// maybe ignore the student's preference?
+		
+		return false;
+	}
+	
+	@Override
+	public boolean validateRequirements(Project project, Student student) {
+		return (validateHardConstraints(project, student) && validateRolesAndSkills(project, student));
+	}
 }
