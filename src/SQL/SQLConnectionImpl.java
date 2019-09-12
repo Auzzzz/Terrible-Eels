@@ -8,7 +8,6 @@ import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
 import model.ProjectImpl;
-import model.constraints.SoftConstraint;
 
 public class SQLConnectionImpl implements SQLConnection {
 	private static Connection conn = null;
@@ -97,7 +96,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public List<SoftConstraint> getAllSoftConstraints() {
+	public List<Constraint> getAllSoftConstraints() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -114,10 +113,14 @@ public class SQLConnectionImpl implements SQLConnection {
 		return null;
 	}
 
-	private List<String> getPopularProjectIds(int popularProjectCounts) {
+	/**
+	 * get the id of popular projects as a list of String
+	 * @param idealNumberOfProject
+	 * @return - list of project IDs
+	 */
+	private List<String> getPopularProjectIds(int idealNumberOfProject) {
 		List<String> projectIds = new ArrayList<>();
-		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + popularProjectCounts + ";";
-//		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT 10;";
+		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + idealNumberOfProject + ";";
 		
 		try {
 			Statement state = conn.createStatement();
@@ -133,33 +136,31 @@ public class SQLConnectionImpl implements SQLConnection {
 		return projectIds;
 	}
 	
-	private Project getProject(String projectId) {
-		String query = "SELECT * FROM Project WHERE ProID = " + projectId + ";";
-		
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-	    	
-	    	if (rs.next()) {
-	    		// TODO: need roles in database
-	    		Project project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
-	    		return project;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
+	// TODO - fix project instantiation - more data required
 	@Override
 	public List<Project> getPopularProjects(int idealNumberOfProjects) {
 		List<Project> projects = new ArrayList<>();
 		List<String> projectIds = getPopularProjectIds(idealNumberOfProjects);
 		
 		for (String projectId : projectIds) {
-			Project project = getProject(projectId); 
-			projects.add(project);
+			Project project = null;
+			String query = "SELECT * FROM Project WHERE ProID = " + projectId + ";";
+			
+			try {
+				Statement state = conn.createStatement();
+				ResultSet rs = state.executeQuery(query);
+		    	
+		    	if (rs.next()) {
+		    		// TODO: use another project constructor
+		    		project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+			if (project != null) {
+				projects.add(project);
+			}
 		}
 		
 		return projects;
@@ -172,7 +173,13 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public void updateProject(Project project) {
+	public void saveProject(Project project) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void saveConstraint(String desc, int weight) {
 		// TODO Auto-generated method stub
 		
 	}
