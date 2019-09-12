@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.ArrayList;
 import enums.Gender;
 import enums.PersonalityType;
+import enums.Role;
 import interfaces.*;
 
 public class StudentImpl implements Student {

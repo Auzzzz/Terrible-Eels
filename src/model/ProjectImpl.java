@@ -3,8 +3,9 @@ package model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
+import enums.Role;
 import interfaces.Project;
-import interfaces.Role;
 import interfaces.Student;
 import model.constraints.AverageGPAConstraint;
 

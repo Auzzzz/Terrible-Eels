@@ -10,6 +10,10 @@ public interface Student {
 	
 	String getName();
 	
+	/**
+	 * get the id of four preferred projects as a list of String
+	 * @return - list of project ids 
+	 */
 	List<String> getProjectPreferences();
 	
 	double getGpa();
