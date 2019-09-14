@@ -11,10 +11,12 @@ public abstract class AbstractConstraint implements Constraint {
 		this.description = description;
 	}
 	
+	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
 	
+	@Override
 	public String getDescription() {
 		return this.description;
 	}
