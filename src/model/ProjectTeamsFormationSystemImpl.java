@@ -1,11 +1,13 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import enums.Role;
+import enums.Skill;
 import interfaces.*;
+import model.ProjectImpl;
+import model.RoleRequirement;
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
 	private SQLConnection connection;
@@ -86,85 +88,211 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return false;
 	}
 	
-	/**
-	 * find a project with given id from the list of popular projects.
-	 * @param projectId
-	 * @param popularProjects
-	 * @return - project object of the list that was found
-	 */
-	private Project isPopularProject(String projectId, List<Project> popularProjects) {
-		for (Project project : popularProjects) {
-			if (projectId.equals(project.getId())) {
-				return project;
+	private RoleRequirement getRoleMatch(TeamFormationState state, Project project, Student student) {
+		List<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		List<RoleRequirement> sRoleReqs = student.getRoleRequirements();
+				
+		for (RoleRequirement pRoleReq : pRoleReqs) {
+			for (RoleRequirement sRoleReq : sRoleReqs) {
+				if (pRoleReq.getRole() == sRoleReq.getRole()) {
+					return pRoleReq;
+				}
 			}
 		}
 		
 		return null;
 	}
 	
-	/**
-	 * assign the given student to a project based on his preferences and constraints
-	 * @param student
-	 * @param popularProjects
-	 * @return - true if the student is successfully assigned
-	 */
-	private boolean assignStudent(Student student, List<Project> popularProjects) {
-		List<String> preferences = student.getProjectPreferences();
+	private RoleRequirement getSkillMatch(TeamFormationState state, Project project, Student student) {
+		List<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		List<RoleRequirement> sRoleReqs = student.getRoleRequirements();
 		
-		for (String preference : preferences) {			
+		for (RoleRequirement pRoleReq : pRoleReqs) {
+			List<Skill> pSkills = pRoleReq.getSkills();
 			
-			// find the preferred 'popular project' object 
-			Project project = isPopularProject(preference, popularProjects);
-			
-			// the preferred project is popular enough
-			if (project != null) {
-				boolean valid = false;
+			for (RoleRequirement sRoleReq : sRoleReqs) {
+				List<Skill> sSkills = sRoleReq.getSkills();
 				
-				// if the project has no member yet
-				if (project.getStudents().isEmpty()) {
-					valid = true;
-				} else {
-					valid = validator.validateRequirements(project, student);
-				}
-				
-				if (valid) {
-					project.addStudent(student);
-					connection.saveProject(project);
-					
-					return true;
+				for (Skill sSkill : sSkills) {
+					if (pSkills.contains(sSkill)) {
+						return pRoleReq;
+					}
 				}
 			}
+		}
+		return null;
+	}
+	
+	private RoleRequirement getRoleAndSkillMatch(TeamFormationState state, Project project, Student student) {
+		List<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		List<RoleRequirement> sRoleReqs = student.getRoleRequirements();
+				
+		for (RoleRequirement pRoleReq : pRoleReqs) {
+			for (RoleRequirement sRoleReq : sRoleReqs) {
+				if (pRoleReq.getRole() == sRoleReq.getRole()) {
+					List<Skill> pSkills = pRoleReq.getSkills();
+					List<Skill> sSkills = sRoleReq.getSkills();
+					
+					for (Skill sSkill : sSkills) {
+						if (pSkills.contains(sSkill)) {
+							return pRoleReq;
+						}
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	private int calculatePreferenceScore(Project project, Student student) {
+		final int FIRST_PREFERENCE = 10;
+		final int SECOND_PREFERENCE = 7;
+		final int THIRD_PREFERENCE = 4;
+		final int FOURTH_PREFERENCE = 1;
+		int score = 0;
+		List<String> preferences = student.getProjectPreferences();
+		
+		for (int i = 1; i <= student.getProjectPreferences().size(); i++) {
+			if (project.getId().equals(preferences.get(i))) {
+				switch(i) {
+					case 1:
+						score += FIRST_PREFERENCE;
+						break;
+					
+					case 2:
+						score += SECOND_PREFERENCE;
+						break;
+					
+					case 3:
+						score += THIRD_PREFERENCE;
+						break;
+						
+					case 4:
+						score += FOURTH_PREFERENCE;
+						break;
+					
+					default:
+				}
+				break;
+			}
+		}
+		return score;
+	}
+	
+	private int calculateRoleRequirementScore(Project project, Student student, TeamFormationState state) {
+		final int ROLE_SKILL_MATCH = 10;
+		final int SKILL_MATCH = 9;
+		final int ROLE_MATCH = 8;
+		int score = 0;
+		
+		if (getRoleAndSkillMatch(state, project, student) != null) {
+			score += ROLE_SKILL_MATCH;
+		} else if (getSkillMatch(state, project, student) != null) {
+			score += SKILL_MATCH;
+		} else if (getRoleMatch(state, project, student) != null) {
+			score += ROLE_MATCH;
+		}
+		
+		return score;
+	}
+	
+	private TeamFormationState calculateScores(TeamFormationState state) {
+		state.resetScoresDataList();
+		List<Project> allProjects = state.getRemainingProjects();
+		List<Student> allStudents = state.getRemainingStudents();
+		
+		for (Project project : allProjects) {
+			ProjectScoresData scoresData = new ProjectScoresData(project);
+			
+			for (Student student : allStudents) {
+				int preferenceScore = calculatePreferenceScore(project, student);
+				int roleRequirementScore = calculateRoleRequirementScore(project, student, state);
+				
+				StudentScore studentScore = new StudentScore(student, preferenceScore+roleRequirementScore);
+				scoresData.addStudentScore(studentScore);
+			}
+			
+			state.addScoresData(scoresData);
+		}
+		
+		return state;
+	}
+	
+	/**
+	 * assign the student into the project if the assignment is valid
+	 * @param project
+	 * @param student
+	 * @return - whether assignment was successful
+	 */
+	private boolean assign(Project project, Student student) {
+		// if the project has no member yet, or if assigning the student meets requirement
+		if (project.getStudents().isEmpty() || (validator.validateHardConstraints(project, student))) {
+			project.addStudent(student);
+			connection.saveProject(project);
+			return true;
 		}
 		
 		return false;
 	}
 	
-	// TODO: return value?
-	private List<Student> assignStudents(List<Student> students, List<Project> popularProjects) {
-		List<Student> unassignedStudents = new LinkedList<>();
+	private TeamFormationState assignStudents(TeamFormationState state) {
+		state = calculateScores(state);
+		List<ProjectScoresData> scoresDataList = state.getScoresDataList();
 		
-		for (Student student : students) {
-			boolean assigned = assignStudent(student, popularProjects);
+		// for each project scores data (each student's score for the project)
+		for (ProjectScoresData scoresData : scoresDataList) {
+			Project project = scoresData.getProject();
 			
-			if (!assigned) {
-				unassignedStudents.add(student);
+			// traverse through sorted collection of StudentScore objects for this project
+			for (StudentScore score : scoresData.getStudentScores()) {
+				if (project.getStudents().size() >= Project.TEAM_CAPACITY) {
+					break;
+				}
+				
+				// students with higher score are first considered
+				Student student = score.getStudent();
+				
+				// if the project has a role available for the student
+				// and if the assignment meets hard constraint
+				RoleRequirement roleMatch = getRoleMatch(state, project, student);
+				if ((roleMatch != null) && (assign(project, student))) {
+					state.removeStudent(student);
+					state.removeRoleRequirement(project.getId(), roleMatch);
+				}
 			}
 		}
 		
-		return unassignedStudents;
+		return state;
+	}
+
+	private void forceAssign(TeamFormationState state) {
+		List<Student> leftOverStudents = state.getRemainingStudents();
+		List<Project> leftOverProjects = state.getRemainingProjects();
+		
+		for (Student student : leftOverStudents) {
+			for (Project project : leftOverProjects) {
+				if (!(project.getStudents().isEmpty())) {
+					project.addStudent(student);
+					connection.saveProject(project);
+					break;
+				}
+			}
+		}
 	}
 	
-	// Assign students into teams based on preferences and constraints
 	@Override
 	public void assignStudents() {
-		// popular projects to which students can be assigned
-		List<Project> popularProjects = getPopularProjects();
-		
+		// projects to which students are to be assigned
+		List<Project> candidateProjects = getPopularProjects();
 		List<Student> femaleStudents = connection.getFemaleStudents();
 		List<Student> maleStudents = connection.getMaleStudents();
 		
-		// TODO: what to do with unassigned students?
-		List<Student> unassigned = assignStudents(femaleStudents, popularProjects);
-		unassigned.addAll(assignStudents(maleStudents, popularProjects));
+		TeamFormationState state = new TeamFormationState(femaleStudents, candidateProjects);
+		state = assignStudents(state);
+		state.addStudents(maleStudents);
+		state = assignStudents(state);
+		
+		forceAssign(state);
 	}
 }
