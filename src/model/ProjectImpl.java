@@ -3,11 +3,11 @@ package model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import enums.Role;
 import interfaces.Project;
 import interfaces.Student;
-import model.constraints.AverageGPAConstraint;
 
 public class ProjectImpl implements Project {
 
@@ -54,5 +54,11 @@ public class ProjectImpl implements Project {
 			return true;
 		}*/
 		return false;
+	}
+
+	@Override
+	public List<RoleRequirement> getRoleRequirements() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

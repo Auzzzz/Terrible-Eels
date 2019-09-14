@@ -1,6 +1,9 @@
 package interfaces;
 
 import java.util.Collection;
+import java.util.List;
+
+import model.RoleRequirement;
 
 public interface Project {
 	static final int TEAM_CAPACITY = 4;
@@ -14,4 +17,6 @@ public interface Project {
 	void addStudent(Student student);
 	
 	boolean removeStudent(Student student);
+
+	List<RoleRequirement> getRoleRequirements();
 }

@@ -1,7 +1,7 @@
 package model;
 
 import java.util.*;
-import java.util.ArrayList;
+
 import enums.Gender;
 import enums.PersonalityType;
 import enums.Role;
@@ -68,5 +68,13 @@ public class StudentImpl implements Student {
 	public PersonalityType getPersonalityType() {
 		return personalityType;
 	}
+
+	@Override
+	public List<RoleRequirement> getRoleRequirements() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 
 }

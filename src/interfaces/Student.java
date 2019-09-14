@@ -4,6 +4,7 @@ import java.util.List;
 
 import enums.Gender;
 import enums.PersonalityType;
+import model.RoleRequirement;
 
 public interface Student {
 	String getStudentNo();
@@ -20,5 +21,7 @@ public interface Student {
 	
 	Gender getGender();
 		
-	PersonalityType getPersonalityType(); 
+	PersonalityType getPersonalityType();
+
+	List<RoleRequirement> getRoleRequirements(); 
 }
