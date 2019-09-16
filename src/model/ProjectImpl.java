@@ -6,7 +6,6 @@ import java.util.HashMap;
 import interfaces.Project;
 import interfaces.Role;
 import interfaces.Student;
-import model.constraints.AverageGPAConstraint;
 
 public class ProjectImpl implements Project {
 

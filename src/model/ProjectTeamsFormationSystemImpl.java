@@ -18,6 +18,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		for (Project project : connection.getAllProjects()) {
 			projectDescs.add(project.getProjectDesc());
+			projectDescs.add("\n");
 		}
 		
 		return projectDescs;
@@ -34,6 +35,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		for (Project project : getPopularProjects()) {
 			projectDescs.add(project.getProjectDesc());
+			projectDescs.add("\n");
 		}
 		
 		return projectDescs;
