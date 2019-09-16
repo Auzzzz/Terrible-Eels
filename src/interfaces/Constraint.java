@@ -2,6 +2,18 @@ package interfaces;
 
 public interface Constraint {
 	/**
+	 * setter for description of the constraint
+	 * @param description
+	 */
+	void setDescription(String description);
+	
+	/**
+	 * getter for description of the constraint
+	 * @param description
+	 */
+	String getDescription();
+	
+	/**
 	 * validate whether addition of the given student into the project would not violate the constraint
 	 * @param project  
 	 * @param student 

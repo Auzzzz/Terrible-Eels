@@ -5,9 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import interfaces.*;
+import model.teamFormation.ValidatorImpl;
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
 	private SQLConnection connection;
+	private Validator validator = new ValidatorImpl(connection);
 	
 	public ProjectTeamsFormationSystemImpl(SQLConnection connection) {
 		this.connection = connection;
@@ -47,8 +49,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		if (!((project1.getId()).equals(project2.getId()))) {
 			// create temporary teams
-			Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<Role>());
-			Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<Role>());
+			Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<enums.Role>());
+			Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<enums.Role>());
 			
 			temp1.addStudent(s2);
 			temp2.addStudent(s1);
@@ -65,7 +67,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				}
 			}
 			
-			if ((temp1.calculateFit() >= acceptableChange) && (temp2.calculateFit() >= acceptableChange)) {
+			if ((validator.calculateFit(temp1) >= acceptableChange) && (validator.calculateFit(temp2) >= acceptableChange)) {
 				project1.removeStudent(s1);
 				project1.addStudent(s2);
 				project2.removeStudent(s2);
@@ -172,8 +174,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	@Override
-	public List<Project> getUnPopularProjects() {
+	public void assignStudents() {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 }

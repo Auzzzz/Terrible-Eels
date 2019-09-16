@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import SQL.SQLConnectionImpl;
 import interfaces.*;
-import model.ProjectTeamsFormationSystemImpl;
+import model.teamFormation.ProjectTeamsFormationSystemImpl;
 
 public class ProjectTeamsFormationSystemTest {
 	private SQLConnection db;
