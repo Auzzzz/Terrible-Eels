@@ -367,7 +367,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		// there will be remained students if the number of students is not divisible by team capacity
 		Collection<Student> remained = state.getRemainingStudents();
-		if (remained.size() != 0) {
+		if (remained.size() > 0) {
 			throw new RemainedStudentsException(remained);
 		}
 		
