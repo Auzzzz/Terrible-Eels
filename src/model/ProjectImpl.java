@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
 import interfaces.Project;
 import interfaces.Student;
 
@@ -55,7 +57,7 @@ public class ProjectImpl implements Project {
 	}
 
 	@Override
-	public List<RoleRequirement> getRoleRequirements() {
+	public Set<RoleRequirement> getRoleRequirements() {
 		// TODO Auto-generated method stub
 		return null;
 	}

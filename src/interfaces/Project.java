@@ -2,6 +2,7 @@ package interfaces;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import model.RoleRequirement;
 
@@ -18,5 +19,5 @@ public interface Project {
 	
 	boolean removeStudent(Student student);
 
-	List<RoleRequirement> getRoleRequirements();
+	Set<RoleRequirement> getRoleRequirements();
 }

@@ -1,6 +1,7 @@
 package SQL;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import interfaces.Constraint;
@@ -63,13 +64,13 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public List<Student> getAllStudents() {
+	public Collection<Student> getAllStudents() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Project> getAllProjects() {
+	public Collection<Project> getAllProjects() {
 		List<Project> projects = new ArrayList<>();
 		String query = "SELECT * FROM Project;";
 		
@@ -90,25 +91,25 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public List<Constraint> getAllHardConstraints() {
+	public Collection<Constraint> getAllHardConstraints() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Constraint> getAllSoftConstraints() {
+	public Collection<Constraint> getAllSoftConstraints() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Student> getFemaleStudents() {
+	public Collection<Student> getFemaleStudents() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Student> getMaleStudents() {
+	public Collection<Student> getMaleStudents() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -118,7 +119,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	 * @param idealNumberOfProject
 	 * @return - list of project IDs
 	 */
-	private List<String> getPopularProjectIds(int idealNumberOfProject) {
+	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
 		List<String> projectIds = new ArrayList<>();
 		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + idealNumberOfProject + ";";
 		
@@ -138,9 +139,9 @@ public class SQLConnectionImpl implements SQLConnection {
 	
 	// TODO - fix project instantiation - more data required
 	@Override
-	public List<Project> getPopularProjects(int idealNumberOfProjects) {
-		List<Project> projects = new ArrayList<>();
-		List<String> projectIds = getPopularProjectIds(idealNumberOfProjects);
+	public Collection<Project> getPopularProjects(int idealNumberOfProjects) {
+		Collection<Project> projects = new ArrayList<>();
+		Collection<String> projectIds = getPopularProjectIds(idealNumberOfProjects);
 		
 		for (String projectId : projectIds) {
 			Project project = null;

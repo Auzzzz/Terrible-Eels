@@ -1,15 +1,15 @@
 package model;
 
-import java.util.List;
+import java.util.Set;
 
 import enums.Role;
 import enums.Skill;
 
 public class RoleRequirement {
 	private Role role;
-	private List<Skill> skills;
+	private Set<Skill> skills;
 	
-	public RoleRequirement(Role role, List<Skill> skills) {
+	public RoleRequirement(Role role, Set<Skill> skills) {
 		this.role = role;
 		this.skills = skills;
 	}
@@ -18,7 +18,7 @@ public class RoleRequirement {
 		return role;
 	}
 	
-	public List<Skill> getSkills() {
+	public Set<Skill> getSkills() {
 		return skills;
 	}
 }

@@ -1,6 +1,7 @@
 package model.constraints;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import interfaces.Project;
@@ -25,7 +26,7 @@ public class AverageGPAConstraint extends AbstractConstraint {
 		return averageGPA;
 	}
 	
-	private double calculateAverageGPA(List<Student> students) {
+	private double calculateAverageGPA(Collection<Student> students) {
 		double totalGPA = 0;
 		
 		for (Student member : students) {
@@ -37,7 +38,7 @@ public class AverageGPAConstraint extends AbstractConstraint {
 	
 	@Override
 	public boolean validate(Project project, Student student) {
-		List<Student> members = (List<Student>) project.getStudents();
+		Collection<Student> members = project.getStudents();
 		int count = members.size();
 		
 		// if there are two members or less, then new member can be added regardless
@@ -60,7 +61,7 @@ public class AverageGPAConstraint extends AbstractConstraint {
 	
 	@Override
 	public boolean validate(Project project) {
-		double averageGPA = calculateAverageGPA((List<Student>) project.getStudents());
+		double averageGPA = calculateAverageGPA(project.getStudents());
 		
 		return (averageGPA >= this.averageGPA) ? false : true;
 	}
