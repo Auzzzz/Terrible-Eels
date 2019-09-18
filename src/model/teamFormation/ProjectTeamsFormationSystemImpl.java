@@ -1,7 +1,9 @@
 package model.teamFormation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import enums.Role;
 import enums.Skill;
@@ -19,8 +21,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public List<String> getAllProjectDescs() {
-		List<String> projectDescs = new ArrayList<>();
+	public Collection<String> getAllProjectDescs() {
+		Collection<String> projectDescs = new ArrayList<>();
 		
 		for (Project project : connection.getAllProjects()) {
 			projectDescs.add(project.getProjectDesc());
@@ -30,15 +32,15 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public List<Project> getPopularProjects() {
+	public Collection<Project> getPopularProjects() {
 		int idealNumberOfProjects = (connection.getStudentCount() / Project.TEAM_CAPACITY);
 		
 		return connection.getPopularProjects(idealNumberOfProjects);
 	}
 	
 	@Override
-	public List<String> getPopularProjectDescs() {
-		List<String> projectDescs = new ArrayList<>();
+	public Collection<String> getPopularProjectDescs() {
+		Collection<String> projectDescs = new ArrayList<>();
 		
 		for (Project project : getPopularProjects()) {
 			projectDescs.add(project.getProjectDesc());
@@ -89,8 +91,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	private RoleRequirement getRoleMatch(TeamFormationState state, Project project, Student student) {
-		List<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
-		List<RoleRequirement> sRoleReqs = student.getRoleRequirements();
+		Set<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		Set<RoleRequirement> sRoleReqs = student.getRolePreferences();
 				
 		for (RoleRequirement pRoleReq : pRoleReqs) {
 			for (RoleRequirement sRoleReq : sRoleReqs) {
@@ -104,14 +106,14 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	private RoleRequirement getSkillMatch(TeamFormationState state, Project project, Student student) {
-		List<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
-		List<RoleRequirement> sRoleReqs = student.getRoleRequirements();
+		Set<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		Set<RoleRequirement> sRoleReqs = student.getRolePreferences();
 		
 		for (RoleRequirement pRoleReq : pRoleReqs) {
-			List<Skill> pSkills = pRoleReq.getSkills();
+			Set<Skill> pSkills = pRoleReq.getSkills();
 			
 			for (RoleRequirement sRoleReq : sRoleReqs) {
-				List<Skill> sSkills = sRoleReq.getSkills();
+				Set<Skill> sSkills = sRoleReq.getSkills();
 				
 				for (Skill sSkill : sSkills) {
 					if (pSkills.contains(sSkill)) {
@@ -124,14 +126,14 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	private RoleRequirement getRoleAndSkillMatch(TeamFormationState state, Project project, Student student) {
-		List<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
-		List<RoleRequirement> sRoleReqs = student.getRoleRequirements();
+		Set<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		Set<RoleRequirement> sRoleReqs = student.getRolePreferences();
 				
 		for (RoleRequirement pRoleReq : pRoleReqs) {
 			for (RoleRequirement sRoleReq : sRoleReqs) {
 				if (pRoleReq.getRole() == sRoleReq.getRole()) {
-					List<Skill> pSkills = pRoleReq.getSkills();
-					List<Skill> sSkills = sRoleReq.getSkills();
+					Set<Skill> pSkills = pRoleReq.getSkills();
+					Set<Skill> sSkills = sRoleReq.getSkills();
 					
 					for (Skill sSkill : sSkills) {
 						if (pSkills.contains(sSkill)) {
@@ -152,23 +154,27 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		final int FOURTH_PREFERENCE = 1;
 		int score = 0;
 		List<String> preferences = student.getProjectPreferences();
+		int preferencesSize = preferences.size();
 		
-		for (int i = 1; i <= student.getProjectPreferences().size(); i++) {
-			if (project.getId().equals(preferences.get(i))) {
+		for (int i = 0; i < preferencesSize; i++) {
+			String preference = preferences.get(i);
+			String projectId = project.getId();
+			
+			if (projectId.equals(preference)) {
 				switch(i) {
-					case 1:
+					case 0:
 						score += FIRST_PREFERENCE;
 						break;
 					
-					case 2:
+					case 1:
 						score += SECOND_PREFERENCE;
 						break;
 					
-					case 3:
+					case 2:
 						score += THIRD_PREFERENCE;
 						break;
 						
-					case 4:
+					case 3:
 						score += FOURTH_PREFERENCE;
 						break;
 					
@@ -199,8 +205,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	
 	private TeamFormationState calculateScores(TeamFormationState state) {
 		state.resetScoresDataList();
-		List<Project> allProjects = state.getRemainingProjects();
-		List<Student> allStudents = state.getRemainingStudents();
+		Collection<Project> allProjects = state.getRemainingProjects();
+		Collection<Student> allStudents = state.getRemainingStudents();
 		
 		for (Project project : allProjects) {
 			ProjectScoresData scoresData = new ProjectScoresData(project);
@@ -225,15 +231,72 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	 * @param student
 	 * @return - whether assignment was successful
 	 */
-	private boolean assign(Project project, Student student) {
+	private TeamFormationState assign(TeamFormationState state, Project project, Student student) {
 		// if the project has no member yet, or if assigning the student meets requirement
 		if (project.getStudents().isEmpty() || (validator.validateHardConstraints(project, student))) {
 			project.addStudent(student);
 			connection.saveProject(project);
-			return true;
+			
+			state.removeStudent(student);
+			state.updateProject(project);
+		}
+		return state;
+	}
+	
+	
+	private TeamFormationState assignToRole(TeamFormationState state, Project project, Student student) {
+		RoleRequirement roleMatch = getRoleMatch(state, project, student);
+		
+		if (roleMatch != null) {
+			state = assign(state, project, student);
+			state.removeRoleRequirement(project.getId(), roleMatch);
 		}
 		
-		return false;
+		return state;
+	}
+	
+	private TeamFormationState assignStudentsToRole(TeamFormationState state) throws InsufficientProjectsException, NoStudentException {
+		Collection<Student> students = state.getRemainingStudents();
+		Collection<Project> projects = state.getRemainingProjects();
+		
+		if (students.size() == 0) {
+			throw new NoStudentException();
+		} 
+		
+		
+		if ((students.size() / Project.TEAM_CAPACITY) > projects.size()) {
+			throw new InsufficientProjectsException();
+		}
+		
+		state = calculateScores(state);
+		List<ProjectScoresData> scoresDataList = state.getScoresDataList();
+		
+		// for each project scores data (each student's score for the project)
+		for (ProjectScoresData scoresData : scoresDataList) {
+			Project project = scoresData.getProject();
+			
+			// traverse through sorted collection of StudentScore objects for this project
+			for (StudentScore score : scoresData.getStudentScores()) {
+				
+				Project remainingProject = state.getProject(project.getId());
+				
+				if ((remainingProject == null)) {
+					break;
+				}
+				
+				// students with higher score are first considered
+				Student student = score.getStudent();
+			
+				// check if the student has not been assigned
+				Student remainingStudent = state.getRemainingStudent(student);
+				
+				if (remainingStudent != null) {
+					assignToRole(state, project, student);
+				}
+			}
+		}
+		
+		return state;
 	}
 	
 	private TeamFormationState assignStudents(TeamFormationState state) {
@@ -246,19 +309,21 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			
 			// traverse through sorted collection of StudentScore objects for this project
 			for (StudentScore score : scoresData.getStudentScores()) {
-				if (project.getStudents().size() >= Project.TEAM_CAPACITY) {
+				
+				Project remainingProject = state.getProject(project.getId());
+				
+				if ((remainingProject == null)) {
 					break;
 				}
 				
 				// students with higher score are first considered
 				Student student = score.getStudent();
+			
+				// check if the student has not been assigned
+				Student remainingStudent = state.getRemainingStudent(student);
 				
-				// if the project has a role available for the student
-				// and if the assignment meets hard constraint
-				RoleRequirement roleMatch = getRoleMatch(state, project, student);
-				if ((roleMatch != null) && (assign(project, student))) {
-					state.removeStudent(student);
-					state.removeRoleRequirement(project.getId(), roleMatch);
+				if (remainingStudent != null) {
+					assign(state, project, student);
 				}
 			}
 		}
@@ -266,15 +331,23 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return state;
 	}
 
+	/**
+	 * assign remaining students to any project with vacancy ignoring hard constraints
+	 * @param state
+	 */
 	private void forceAssign(TeamFormationState state) {
-		List<Student> leftOverStudents = state.getRemainingStudents();
-		List<Project> leftOverProjects = state.getRemainingProjects();
+		List<Student> students = new ArrayList<>(state.getRemainingStudents());
+		List<Project> projects = new ArrayList<>(state.getRemainingProjects());
 		
-		for (Student student : leftOverStudents) {
-			for (Project project : leftOverProjects) {
-				if (!(project.getStudents().isEmpty())) {
+		for (Student student : students) {
+			for (Project project : projects) {
+				if ((project.getStudents().size() < Project.TEAM_CAPACITY)) {
 					project.addStudent(student);
 					connection.saveProject(project);
+					
+					state.removeStudent(student);
+					state.updateProject(project);
+					
 					break;
 				}
 			}
@@ -282,17 +355,31 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public void assignStudents() {
+	public boolean assignAllStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException {
 		// projects to which students are to be assigned
-		List<Project> candidateProjects = getPopularProjects();
-		List<Student> femaleStudents = connection.getFemaleStudents();
-		List<Student> maleStudents = connection.getMaleStudents();
+		Collection<Project> candidateProjects = getPopularProjects();
+		Collection<Student> femaleStudents = connection.getFemaleStudents();
+		Collection<Student> maleStudents = connection.getMaleStudents();
 		
+		// assign female students first
 		TeamFormationState state = new TeamFormationState(femaleStudents, candidateProjects);
-		state = assignStudents(state);
-		state.addStudents(maleStudents);
+		state = assignStudentsToRole(state);
 		state = assignStudents(state);
 		
+		// assign male students
+		state.addStudents(maleStudents);
+		state = assignStudentsToRole(state);
+		state = assignStudents(state);
+		
+		// assign remaining students to any project with vacancy
 		forceAssign(state);
+		
+		// there will be remained students if the number of students is not divisible by team capacity
+		Collection<Student> remained = state.getRemainingStudents();
+		if (remained.size() != 0) {
+			throw new RemainedStudentsException(remained);
+		}
+		
+		return (state.getRemainingStudents().size() == 0);
 	}
 }
