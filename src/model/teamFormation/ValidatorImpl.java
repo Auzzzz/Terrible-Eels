@@ -43,4 +43,15 @@ public class ValidatorImpl implements Validator {
 		}
 		return true;
 	}
+	
+	@Override
+	public boolean validateHardConstraints(Project project) {
+		boolean valid = false;
+		
+		for (Constraint constraint : connection.getAllHardConstraints()) {
+			valid = (constraint.validate(project)) ? true : false;
+		}
+		
+		return valid;
+	}
 }
