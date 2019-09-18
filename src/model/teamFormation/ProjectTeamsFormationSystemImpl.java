@@ -203,7 +203,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return score;
 	}
 	
-	private TeamFormationState calculateScores(TeamFormationState state) {
+	private void calculateScores(TeamFormationState state) {
 		state.resetScoresDataList();
 		Collection<Project> allProjects = state.getRemainingProjects();
 		Collection<Student> allStudents = state.getRemainingStudents();
@@ -221,8 +221,6 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			
 			state.addScoresData(scoresData);
 		}
-		
-		return state;
 	}
 	
 	/**
@@ -231,7 +229,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	 * @param student
 	 * @return - whether assignment was successful
 	 */
-	private TeamFormationState assign(TeamFormationState state, Project project, Student student) {
+	private void assign(TeamFormationState state, Project project, Student student) {
 		// if the project has no member yet, or if assigning the student meets requirement
 		if (project.getStudents().isEmpty() || (validator.validateHardConstraints(project, student))) {
 			project.addStudent(student);
@@ -240,22 +238,19 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			state.removeStudent(student);
 			state.updateProject(project);
 		}
-		return state;
 	}
 	
 	
-	private TeamFormationState assignToRole(TeamFormationState state, Project project, Student student) {
+	private void assignToRole(TeamFormationState state, Project project, Student student) {
 		RoleRequirement roleMatch = getRoleMatch(state, project, student);
 		
 		if (roleMatch != null) {
-			state = assign(state, project, student);
+			assign(state, project, student);
 			state.removeRoleRequirement(project.getId(), roleMatch);
 		}
-		
-		return state;
 	}
 	
-	private TeamFormationState assignStudentsToRole(TeamFormationState state) throws InsufficientProjectsException, NoStudentException {
+	private void assignStudentsToRole(TeamFormationState state) throws InsufficientProjectsException, NoStudentException {
 		Collection<Student> students = state.getRemainingStudents();
 		Collection<Project> projects = state.getRemainingProjects();
 		
@@ -268,7 +263,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			throw new InsufficientProjectsException();
 		}
 		
-		state = calculateScores(state);
+		calculateScores(state);
 		List<ProjectScoresData> scoresDataList = state.getScoresDataList();
 		
 		// for each project scores data (each student's score for the project)
@@ -295,12 +290,10 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				}
 			}
 		}
-		
-		return state;
 	}
 	
-	private TeamFormationState assignStudents(TeamFormationState state) {
-		state = calculateScores(state);
+	private void assignStudents(TeamFormationState state) {
+		calculateScores(state);
 		List<ProjectScoresData> scoresDataList = state.getScoresDataList();
 		
 		// for each project scores data (each student's score for the project)
@@ -327,8 +320,6 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				}
 			}
 		}
-		
-		return state;
 	}
 
 	/**
@@ -363,13 +354,13 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		// assign female students first
 		TeamFormationState state = new TeamFormationState(femaleStudents, candidateProjects);
-		state = assignStudentsToRole(state);
-		state = assignStudents(state);
+		assignStudentsToRole(state);
+		assignStudents(state);
 		
 		// assign male students
 		state.addStudents(maleStudents);
-		state = assignStudentsToRole(state);
-		state = assignStudents(state);
+		assignStudentsToRole(state);
+		assignStudents(state);
 		
 		// assign remaining students to any project with vacancy
 		forceAssign(state);
