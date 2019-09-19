@@ -1,24 +1,30 @@
 package model;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import enums.Role;
 import enums.Skill;
 
 public class RoleRequirement {
 	private Role role;
+	
 	private List<Skill> skills;
+	
+	public RoleRequirement(Role role, Collection<Skill> skills) {
 
-	public RoleRequirement(Role role, List<Skill> skills) {
 		this.role = role;
-		this.skills = skills;
+		this.skills = (List<Skill>) skills;
 	}
 
 	public Role getRole() {
 		return role;
 	}
 
-	public List<Skill> getSkills() {
+	
+	public Collection<Skill> getSkills() {
+
 		return skills;
 	}
 
@@ -29,7 +35,7 @@ public class RoleRequirement {
 	 */
 	public int compare(RoleRequirement role) {
 		int result = -1;
-		List<Skill> roleSkills = role.getSkills();
+		List<Skill> roleSkills = (List<Skill>) role.getSkills();
 		if (role.getRole() == this.role) {
 			result = 0;
 			for (Skill s : roleSkills) {

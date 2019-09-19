@@ -1,25 +1,25 @@
 package interfaces;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface SQLConnection {
 	int getStudentCount();
 	
 	int getProjectCount();
 		
-	List<Student> getAllStudents();
+	Collection<Student> getAllStudents();
 	
-	List<Project> getAllProjects();
+	Collection<Project> getAllProjects();
 	
-	List<Constraint> getAllHardConstraints();
+	Collection<Constraint> getAllHardConstraints();
 	
-	List<Constraint> getAllSoftConstraints();
+	Collection<Constraint> getAllSoftConstraints();
 	
-	List<Student> getFemaleStudents();
+	Collection<Student> getFemaleStudents();
 	
-	List<Student> getMaleStudents();
+	Collection<Student> getMaleStudents();
 	
-	List<Project> getPopularProjects(int idealNumberOfProjects);
+	Collection<Project> getPopularProjects(int idealNumberOfProjects);
 	
 	/**
 	 * get project which the given student is assigned to

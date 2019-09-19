@@ -1,9 +1,12 @@
 package model.teamFormation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import interfaces.Project;
 import interfaces.Student;
@@ -18,48 +21,62 @@ import model.RoleRequirement;
  *
  */
 public class TeamFormationState {
-	private List<Student> remainingStudents;
-	private List<Project> remainingProjects;
-	private Map<String, List<RoleRequirement>> roleRequirements = new HashMap<>();
+	private Map<String, Student> remainingStudents = new HashMap<>();
+	private Map<String, Project> remainingProjects = new LinkedHashMap<>();
+	private Map<String, Set<RoleRequirement>> roleRequirements = new HashMap<>();
 	private List<ProjectScoresData> scoresDataList = new ArrayList<>();
+	private Collection<Project> formedProjects = new ArrayList<>();
 	
-	public TeamFormationState(List<Student> remainingStudents, List<Project> remainingProjects) {
-		this.remainingStudents = remainingStudents;
-		this.remainingProjects = remainingProjects;
+	public TeamFormationState(Collection<Student> remainingStudents, Collection<Project> remainingProjects) {
+		for (Student student : remainingStudents) {
+			this.remainingStudents.put(student.getStudentNo(), student);
+		}
 		
 		// initialise roleRequirements (associate each project id - its role requirements)
 		for (Project project : remainingProjects) {
+
 			List<RoleRequirement> roleRequirements = (List<RoleRequirement>) project.getRoleRequirements();
-			this.roleRequirements.put(project.getId(), roleRequirements);
+
+			(this.remainingProjects).put(project.getId(), project);
+			
+			Set<RoleRequirement> roleRequirements1 = (Set<RoleRequirement>) project.getRoleRequirements();
+
+			this.roleRequirements.put(project.getId(), roleRequirements1);
 		}
 	}
 	
-	public List<Student> getRemainingStudents() {
-		return remainingStudents;
+	public Collection<Student> getRemainingStudents() {
+		return remainingStudents.values();
 	}
 	
-	public List<Project> getRemainingProjects() {
-		return remainingProjects;
+	public Collection<Project> getRemainingProjects() {
+		return remainingProjects.values();
+	}
+	
+	public Collection<Project> getFormedProjects() {
+		return formedProjects;
 	}
 	
 	public void removeStudent(Student student) {
-		remainingStudents.remove(student);
+		remainingStudents.remove(student.getStudentNo());
 	}
 	
 	public void removeProject(Project project) {
-		remainingProjects.remove(project);
+		remainingProjects.remove(project.getId());
 	}
 	
-	public void addStudents(List<Student> students) {
-		remainingStudents.addAll(students);
+	public void addStudents(Collection<Student> students) {
+		for (Student student : students) {
+			remainingStudents.put(student.getStudentNo(), student);
+		}
 	}
 	
 	public void removeRoleRequirement(String projectId, RoleRequirement roleReq) {
-		List<RoleRequirement> roleRequirementsList = roleRequirements.get(projectId);
+		Set<RoleRequirement> roleRequirementsList = roleRequirements.get(projectId);
 		roleRequirementsList.remove(roleReq);
 	}
 	
-	public List<RoleRequirement> getRoleRequirements(Project project) {
+	public Set<RoleRequirement> getRoleRequirements(Project project) {
 		return roleRequirements.get(project.getId());
 	}
 	
@@ -73,5 +90,22 @@ public class TeamFormationState {
 	
 	public void resetScoresDataList() {
 		scoresDataList.clear();
+	}
+	
+	public void updateProject(Project project) {
+		if (project.getStudents().size() >= Project.TEAM_CAPACITY) {
+			Project formed = remainingProjects.remove(project.getId());
+			formedProjects.add(formed);
+		} else {
+			remainingProjects.put(project.getId(), project);
+		}
+	}
+	
+	public Project getProject(String projectId) {
+		return remainingProjects.get(projectId);
+	}
+	
+	public Student getRemainingStudent(Student student) {
+		return remainingStudents.get(student.getStudentNo());
 	}
 }

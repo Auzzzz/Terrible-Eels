@@ -1,5 +1,6 @@
 package model.constraints;
 
+import java.util.Collection;
 import java.util.List;
 
 import interfaces.Project;
@@ -25,7 +26,7 @@ public class GPAConstraint extends AbstractConstraint {
 		return this.gpa;
 	}
 	
-	private int countGPAThree(List<Student> students) {
+	private int countGPAThree(Collection<Student> students) {
 		int gpaThreeCount = 0;
 		
 		for (Student student : students) {
@@ -39,7 +40,7 @@ public class GPAConstraint extends AbstractConstraint {
 	
 	@Override
 	public boolean validate(Project project, Student student) {
-		List<Student> members = (List<Student>)project.getStudents();
+		Collection<Student> members = project.getStudents();
 		int memberCount = members.size();
 		int gpaThreeCount = countGPAThree(members);  // number of members with GPA > 3.0
 		double candidateGPA = student.getGpa();
@@ -76,6 +77,19 @@ public class GPAConstraint extends AbstractConstraint {
 	
 	@Override
 	public boolean validate(Project project) {
-		return (countGPAThree((List<Student>)project.getStudents()) >= COUNT_TWO) ? true : false;
+		Collection<Student> members = project.getStudents();
+		int numOfMembers = members.size();
+		
+		if (numOfMembers >= Project.TEAM_CAPACITY) {
+			return (countGPAThree(members) >= COUNT_TWO) ? true : false;
+		}
+		
+		else if (numOfMembers == 3) {
+			return (countGPAThree(members) >= 1);
+		}
+		
+		return true;
+		
+		
 	}
 }

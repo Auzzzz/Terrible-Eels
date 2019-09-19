@@ -1,18 +1,22 @@
 package interfaces;
 
-import java.util.List;
+import java.util.Collection;
+
+import model.teamFormation.InsufficientProjectsException;
+import model.teamFormation.NoStudentException;
+import model.teamFormation.RemainedStudentsException;
 
 public interface ProjectTeamsFormationSystem {
-	List<String> getAllProjectDescs();
+	Collection<String> getAllProjectDescs();
 	
 	/**
 	 * get popular projects as a list of Projects
 	 * the number of popular projects equals to the number of teams to be formed
 	 * @return - list of Projects
 	 */
-	List<Project> getPopularProjects();
+	Collection<Project> getPopularProjects();
 	
-	List<String> getPopularProjectDescs();
+	Collection<String> getPopularProjectDescs();
 	
 	/**
 	 * swaps members between teams as long as the overall fitness value for swapped teams 
@@ -24,8 +28,14 @@ public interface ProjectTeamsFormationSystem {
 	 */
 	boolean swap(Student s1, Student s2, int acceptableChange);
 	
+	
 	/**
-	 * assign students into projects
+	 * assign all students into projects
+	 * @return - true if all students are successfully assigned to projects
+	 * @throws NoStudentException 
+	 * @throws InsufficientProjectsException 
+	 * @throws RemainedStudentsException 
 	 */
-	void assignStudents();
+	boolean assignAllStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException;
+
 }

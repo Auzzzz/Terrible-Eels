@@ -1,6 +1,7 @@
 package interfaces;
 
 import java.util.List;
+import java.util.Set;
 
 import enums.Gender;
 import enums.PersonalityType;
@@ -23,5 +24,5 @@ public interface Student {
 		
 	PersonalityType getPersonalityType();
 
-	List<RoleRequirement> getRoleRequirements(); 
+	Set<RoleRequirement> getRolePreferences(); 
 }
