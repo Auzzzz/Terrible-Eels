@@ -3,7 +3,6 @@ package model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import interfaces.Project;
 import interfaces.Student;
 

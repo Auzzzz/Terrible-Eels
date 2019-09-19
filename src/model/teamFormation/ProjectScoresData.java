@@ -4,7 +4,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import interfaces.Project;
-import interfaces.Student;
 
 /**
  * ProjectScoresData:

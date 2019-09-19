@@ -2,8 +2,6 @@ package model.teamFormation;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import enums.Role;
 import enums.Skill;
 import interfaces.*;
 import model.ProjectImpl;
