@@ -12,6 +12,7 @@ import interfaces.Student;
 public class AverageGPAConstraint extends AbstractConstraint {
 	public static final double GPA_AVERAGE_2019 = 3.5;	// may be changed later by project manager
 	private double averageGPA = GPA_AVERAGE_2019;		// variable to allow to be changed
+	String description;
 	
 	public AverageGPAConstraint(String description) {
 		super(description);

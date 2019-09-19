@@ -13,7 +13,7 @@ public class ProjectImpl implements Project {
 	ArrayList<RoleRequirement> rolesReq = new ArrayList<RoleRequirement>();
 	String projectId;
 	String description;
-	
+
 	public ProjectImpl(String projectId, String description, Collection<RoleRequirement> roles) {
 		this.projectId = projectId;
 		this.description = description;
@@ -39,17 +39,10 @@ public class ProjectImpl implements Project {
 	public boolean removeStudent(Student student) {
 		return students.remove(student.getStudentNo(), student);
 	}
-	
+
 	@Override
 	public void addStudent(Student student) {
-		if (validateAdd(student)) {
-			students.put(student.getStudentNo(), student);
-		}
-	}
-
-	private boolean validateAdd(Student student ) {
-		
-		return false;
+		students.put(student.getStudentNo(), student);
 	}
 
 	@Override
