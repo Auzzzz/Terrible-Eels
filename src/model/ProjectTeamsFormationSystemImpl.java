@@ -49,8 +49,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		if (!((project1.getId()).equals(project2.getId()))) {
 			// create temporary teams
-			Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<enums.Role>());
-			Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<enums.Role>());
+			Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<RoleRequirement>());
+			Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<RoleRequirement>());
 			
 			temp1.addStudent(s2);
 			temp2.addStudent(s1);

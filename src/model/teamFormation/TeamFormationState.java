@@ -29,7 +29,7 @@ public class TeamFormationState {
 		
 		// initialise roleRequirements (associate each project id - its role requirements)
 		for (Project project : remainingProjects) {
-			List<RoleRequirement> roleRequirements = project.getRoleRequirements();
+			List<RoleRequirement> roleRequirements = (List<RoleRequirement>) project.getRoleRequirements();
 			this.roleRequirements.put(project.getId(), roleRequirements);
 		}
 	}

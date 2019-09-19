@@ -10,14 +10,14 @@ import interfaces.Student;
 public class ProjectImpl implements Project {
 
 	HashMap<String, Student> students = new HashMap<String, Student>();
-	ArrayList<enums.Role> rolesReq = new ArrayList<enums.Role>();
+	ArrayList<RoleRequirement> rolesReq = new ArrayList<RoleRequirement>();
 	String projectId;
 	String description;
 	
-	public ProjectImpl(String projectId, String description, Collection<enums.Role> roles) {
+	public ProjectImpl(String projectId, String description, Collection<RoleRequirement> roles) {
 		this.projectId = projectId;
 		this.description = description;
-		this.rolesReq = (ArrayList<enums.Role>) roles;
+		this.rolesReq = (ArrayList<RoleRequirement>) roles;
 	}
 
 	@Override
@@ -47,16 +47,13 @@ public class ProjectImpl implements Project {
 		}
 	}
 
-	private boolean validateAdd(Student student) {
-		/*if(AverageGPAConstraint.validate(this, student)) {
-			return true;
-		}*/
+	private boolean validateAdd(Student student ) {
+		
 		return false;
 	}
 
 	@Override
-	public List<RoleRequirement> getRoleRequirements() {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<RoleRequirement> getRoleRequirements() {
+		return rolesReq;
 	}
 }

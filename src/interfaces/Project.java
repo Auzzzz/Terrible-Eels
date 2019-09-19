@@ -18,5 +18,5 @@ public interface Project {
 	
 	boolean removeStudent(Student student);
 
-	List<RoleRequirement> getRoleRequirements();
+	Collection<RoleRequirement> getRoleRequirements();
 }
