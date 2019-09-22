@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import enums.Role;
 import enums.Skill;
 import interfaces.*;
 import model.ProjectImpl;
@@ -31,8 +30,14 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public Collection<Project> getPopularProjects() {
-		int idealNumberOfProjects = (connection.getStudentCount() / Project.TEAM_CAPACITY);
+	public Collection<Project> getPopularProjects() throws NoStudentException {
+		int numStudents = connection.getStudentCount();
+		
+		if (numStudents == 0) {
+			throw new NoStudentException();
+		}
+		
+		int idealNumberOfProjects = (numStudents / Project.TEAM_CAPACITY);
 		
 		return connection.getPopularProjects(idealNumberOfProjects);
 	}
@@ -41,8 +46,12 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	public Collection<String> getPopularProjectDescs() {
 		Collection<String> projectDescs = new ArrayList<>();
 		
-		for (Project project : getPopularProjects()) {
-			projectDescs.add(project.getProjectDesc());
+		try {
+			for (Project project : getPopularProjects()) {
+				projectDescs.add(project.getProjectDesc());
+			}
+		} catch (NoStudentException e) {
+			// e.printStackTrace();
 		}
 		
 		return projectDescs;
@@ -202,8 +211,9 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return score;
 	}
 	
-	private void calculateScores(TeamFormationState state) {
-		state.resetScoresDataList();
+	private List<ProjectScoresData> calculateScores(TeamFormationState state) {
+		List<ProjectScoresData> scoresDataList = new ArrayList<>();
+		
 		Collection<Project> allProjects = state.getRemainingProjects();
 		Collection<Student> allStudents = state.getRemainingStudents();
 		
@@ -218,8 +228,10 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				scoresData.addStudentScore(studentScore);
 			}
 			
-			state.addScoresData(scoresData);
+			scoresDataList.add(scoresData);
 		}
+		
+		return scoresDataList;
 	}
 	
 	/**
@@ -253,17 +265,18 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		Collection<Student> students = state.getRemainingStudents();
 		Collection<Project> projects = state.getRemainingProjects();
 		
+		// there's no student to form team
 		if (students.size() == 0) {
 			throw new NoStudentException();
 		} 
 		
-		
+		// not enough number of projects for all students
 		if ((students.size() / Project.TEAM_CAPACITY) > projects.size()) {
 			throw new InsufficientProjectsException();
 		}
 		
-		calculateScores(state);
-		List<ProjectScoresData> scoresDataList = state.getScoresDataList();
+		List<ProjectScoresData> scoresDataList = calculateScores(state);
+		
 		
 		// for each project scores data (each student's score for the project)
 		for (ProjectScoresData scoresData : scoresDataList) {
@@ -272,8 +285,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			// traverse through sorted collection of StudentScore objects for this project
 			for (StudentScore score : scoresData.getStudentScores()) {
 				
-				Project remainingProject = state.getProject(project.getId());
-				
+				// check if the project team has been formed
+				Project remainingProject = state.getRemainingProject(project.getId());
 				if ((remainingProject == null)) {
 					break;
 				}
@@ -282,8 +295,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				Student student = score.getStudent();
 			
 				// check if the student has not been assigned
-				Student remainingStudent = state.getRemainingStudent(student);
-				
+				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
 					assignToRole(state, project, student);
 				}
@@ -292,8 +304,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	private void assignStudents(TeamFormationState state) {
-		calculateScores(state);
-		List<ProjectScoresData> scoresDataList = state.getScoresDataList();
+		List<ProjectScoresData> scoresDataList = calculateScores(state);
 		
 		// for each project scores data (each student's score for the project)
 		for (ProjectScoresData scoresData : scoresDataList) {
@@ -302,8 +313,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			// traverse through sorted collection of StudentScore objects for this project
 			for (StudentScore score : scoresData.getStudentScores()) {
 				
-				Project remainingProject = state.getProject(project.getId());
-				
+				// check if the project team has been formed
+				Project remainingProject = state.getRemainingProject(project.getId());
 				if ((remainingProject == null)) {
 					break;
 				}
@@ -312,8 +323,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				Student student = score.getStudent();
 			
 				// check if the student has not been assigned
-				Student remainingStudent = state.getRemainingStudent(student);
-				
+				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
 					assign(state, project, student);
 				}
@@ -345,7 +355,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public boolean assignAllStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException {
+	public boolean assignStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException {
 		// projects to which students are to be assigned
 		Collection<Project> candidateProjects = getPopularProjects();
 		Collection<Student> femaleStudents = connection.getFemaleStudents();

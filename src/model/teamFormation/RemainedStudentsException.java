@@ -11,4 +11,8 @@ public class RemainedStudentsException extends Exception {
 	public RemainedStudentsException(Collection<Student> remainedStudents) {
 		this.remainedStudents = remainedStudents;
 	}
+	
+	public Collection<Student> getRemainedStudents() {
+		return remainedStudents;
+	}
 }

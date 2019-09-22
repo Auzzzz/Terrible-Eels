@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +23,6 @@ public class TeamFormationState {
 	private Map<String, Student> remainingStudents = new HashMap<>();
 	private Map<String, Project> remainingProjects = new LinkedHashMap<>();
 	private Map<String, Set<RoleRequirement>> roleRequirements = new HashMap<>();
-	private List<ProjectScoresData> scoresDataList = new ArrayList<>();
 	private Collection<Project> formedProjects = new ArrayList<>();
 	
 	public TeamFormationState(Collection<Student> remainingStudents, Collection<Project> remainingProjects) {
@@ -32,16 +30,9 @@ public class TeamFormationState {
 			this.remainingStudents.put(student.getStudentNo(), student);
 		}
 		
-		// initialise roleRequirements (associate each project id - its role requirements)
 		for (Project project : remainingProjects) {
-
-			List<RoleRequirement> roleRequirements = (List<RoleRequirement>) project.getRoleRequirements();
-
 			(this.remainingProjects).put(project.getId(), project);
-			
-			Set<RoleRequirement> roleRequirements1 = (Set<RoleRequirement>) project.getRoleRequirements();
-
-			this.roleRequirements.put(project.getId(), roleRequirements1);
+			(this.roleRequirements).put(project.getId(), (Set<RoleRequirement>) project.getRoleRequirements());
 		}
 	}
 	
@@ -80,18 +71,6 @@ public class TeamFormationState {
 		return roleRequirements.get(project.getId());
 	}
 	
-	public void addScoresData(ProjectScoresData scoreSet) {
-		scoresDataList.add(scoreSet);
-	}
-	
-	public List<ProjectScoresData> getScoresDataList() {
-		return scoresDataList;
-	}
-	
-	public void resetScoresDataList() {
-		scoresDataList.clear();
-	}
-	
 	public void updateProject(Project project) {
 		if (project.getStudents().size() >= Project.TEAM_CAPACITY) {
 			Project formed = remainingProjects.remove(project.getId());
@@ -101,11 +80,11 @@ public class TeamFormationState {
 		}
 	}
 	
-	public Project getProject(String projectId) {
+	public Project getRemainingProject(String projectId) {
 		return remainingProjects.get(projectId);
 	}
 	
-	public Student getRemainingStudent(Student student) {
-		return remainingStudents.get(student.getStudentNo());
+	public Student getRemainingStudent(String studentNo) {
+		return remainingStudents.get(studentNo);
 	}
 }

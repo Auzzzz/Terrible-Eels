@@ -13,8 +13,9 @@ public interface ProjectTeamsFormationSystem {
 	 * get popular projects as a list of Projects
 	 * the number of popular projects equals to the number of teams to be formed
 	 * @return - list of Projects
+	 * @throws NoStudentException 
 	 */
-	Collection<Project> getPopularProjects();
+	Collection<Project> getPopularProjects() throws NoStudentException;
 	
 	Collection<String> getPopularProjectDescs();
 	
@@ -36,6 +37,6 @@ public interface ProjectTeamsFormationSystem {
 	 * @throws InsufficientProjectsException 
 	 * @throws RemainedStudentsException 
 	 */
-	boolean assignAllStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException;
+	boolean assignStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException;
 
 }
