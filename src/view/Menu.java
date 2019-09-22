@@ -1,5 +1,6 @@
-package model;
+package view;
 
+import java.util.Collection;
 import java.util.Scanner;
 import SQL.SQLConnectionImpl;
 import interfaces.ProjectTeamsFormationSystem;
@@ -71,11 +72,15 @@ public class Menu {
 
 				switch (input) {
 				case "1":
-					System.out.println(system.getAllProjectDescs());
+					Collection<String> descs = system.getAllProjectDescs();
+					descs.forEach(System.out::println);
 					run();
 					break;
+					
 				case "2":
-					System.out.println(system.getPopularProjectDescs());
+					Collection<String> popularDescs = system.getPopularProjectDescs();
+					popularDescs.forEach(System.out::println);
+					
 					run();
 					break;
 

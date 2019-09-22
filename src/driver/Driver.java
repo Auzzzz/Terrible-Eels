@@ -1,5 +1,6 @@
-package model;
+package driver;
 
+import view.Menu;
 import java.awt.EventQueue;
 
 public class Driver {
