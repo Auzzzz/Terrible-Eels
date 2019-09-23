@@ -3,7 +3,6 @@ package model.teamFormation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import enums.Skill;
 import interfaces.*;
 import model.ProjectImpl;
@@ -30,11 +29,12 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public Collection<Project> getPopularProjects() throws NoStudentException {
+	public Collection<Project> getPopularProjects() throws InsufficientStudentsException {
 		int numStudents = connection.getStudentCount();
 		
-		if (numStudents == 0) {
-			throw new NoStudentException();
+		// there need to be at least 4 students
+		if (numStudents < Project.TEAM_CAPACITY) {
+			throw new InsufficientStudentsException();
 		}
 		
 		int idealNumberOfProjects = (numStudents / Project.TEAM_CAPACITY);
@@ -50,7 +50,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			for (Project project : getPopularProjects()) {
 				projectDescs.add(project.getProjectDesc());
 			}
-		} catch (NoStudentException e) {
+		} catch (InsufficientStudentsException e) {
 			// e.printStackTrace();
 		}
 		
@@ -98,13 +98,23 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return false;
 	}
 	
+	/**
+	 * Find a RoleRequirement of Project of which Role matches with the student's preference on Role.
+	 * Return null if no matching Role was found.
+	 * 
+	 * @param state
+	 * @param project
+	 * @param student
+	 * @return - a RoleRequirement with matching Role
+	 */
 	private RoleRequirement getRoleMatch(TeamFormationState state, Project project, Student student) {
-		Set<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
-		Set<RoleRequirement> sRoleReqs = student.getRolePreferences();
+		Collection<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		Collection<RoleRequirement> sRoleReqs = student.getRolePreferences();
 				
 		for (RoleRequirement pRoleReq : pRoleReqs) {
 			for (RoleRequirement sRoleReq : sRoleReqs) {
-				if (pRoleReq.getRole() == sRoleReq.getRole()) {
+				// project's Role and student's Role matches
+				if (pRoleReq.getRole().equals(sRoleReq.getRole())) {
 					return pRoleReq;
 				}
 			}
@@ -113,16 +123,27 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return null;
 	}
 	
+	/**
+	 * Find a RoleRequirement of Project of which Role requires a Skill that matches 
+	 * with one of the student's Skills.
+	 * Return null if no matching Skill was found.
+	 * 
+	 * @param state
+	 * @param project
+	 * @param student
+	 * @return - a RoleRequirement with matching Skill
+	 */
 	private RoleRequirement getSkillMatch(TeamFormationState state, Project project, Student student) {
-		Set<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
-		Set<RoleRequirement> sRoleReqs = student.getRolePreferences();
+		Collection<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		Collection<RoleRequirement> sRoleReqs = student.getRolePreferences();
 		
 		for (RoleRequirement pRoleReq : pRoleReqs) {
-			Set<Skill> pSkills = (Set<Skill>) pRoleReq.getSkills();
+			Collection<Skill> pSkills = pRoleReq.getSkills();
 			
 			for (RoleRequirement sRoleReq : sRoleReqs) {
-				Set<Skill> sSkills = (Set<Skill>) sRoleReq.getSkills();
+				Collection<Skill> sSkills = sRoleReq.getSkills();
 				
+				// check if the project's role requirement contains a skill that the student has
 				for (Skill sSkill : sSkills) {
 					if (pSkills.contains(sSkill)) {
 						return pRoleReq;
@@ -133,15 +154,30 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return null;
 	}
 	
+	/**
+	 * Find a RoleRequirement of Project of which Role AND one of its Skills matches with
+	 * the student's preference.
+	 * 
+	 * E.g., If the project has (Role 1 - Skill 1, Skill 2, Skill 3) and 
+	 * the student has (Role 1 - Skill 1, Skill 4), then a RoleRequirement for Role1 is returned
+	 * because (Role 1 - Skill 1) pair appears in the student's.
+	 * 
+	 * @param state
+	 * @param project
+	 * @param student
+	 * @return - a RoleRequirement with matching Skill
+	 */
 	private RoleRequirement getRoleAndSkillMatch(TeamFormationState state, Project project, Student student) {
-		Set<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
-		Set<RoleRequirement> sRoleReqs = student.getRolePreferences();
+		Collection<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
+		Collection<RoleRequirement> sRoleReqs = student.getRolePreferences();
 				
 		for (RoleRequirement pRoleReq : pRoleReqs) {
 			for (RoleRequirement sRoleReq : sRoleReqs) {
-				if (pRoleReq.getRole() == sRoleReq.getRole()) {
-					Set<Skill> pSkills = (Set<Skill>) pRoleReq.getSkills();
-					Set<Skill> sSkills = (Set<Skill>) sRoleReq.getSkills();
+				
+				// project's Role and student's Role matches
+				if (pRoleReq.getRole().equals(sRoleReq.getRole())) {
+					Collection<Skill> pSkills = pRoleReq.getSkills();
+					Collection<Skill> sSkills = sRoleReq.getSkills();
 					
 					for (Skill sSkill : sSkills) {
 						if (pSkills.contains(sSkill)) {
@@ -155,7 +191,16 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return null;
 	}
 	
+	/**
+	 * calculate the student's 'fitness score' for the project based on the student's preferences; 
+	 * if the project is preferred by the student, certain value is added to the score.
+	 * 
+	 * @param project
+	 * @param student
+	 * @return - fitness score of the student for the project
+	 */
 	private int calculatePreferenceScore(Project project, Student student) {
+		// fitness values
 		final int FIRST_PREFERENCE = 10;
 		final int SECOND_PREFERENCE = 7;
 		final int THIRD_PREFERENCE = 4;
@@ -194,7 +239,17 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		return score;
 	}
 	
+	/**
+	 * calculate the student's 'fitness score' for the project based on the student's preferences; 
+	 * if the project's Role / Skill requirement matches with the student's preference, 
+	 * certain value is added to the score.
+	 * 
+	 * @param project
+	 * @param student
+	 * @return - fitness score of the student for the project
+	 */
 	private int calculateRoleRequirementScore(Project project, Student student, TeamFormationState state) {
+		// fitness values
 		final int ROLE_SKILL_MATCH = 10;
 		final int SKILL_MATCH = 9;
 		final int ROLE_MATCH = 8;
@@ -202,21 +257,31 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		if (getRoleAndSkillMatch(state, project, student) != null) {
 			score += ROLE_SKILL_MATCH;
-		} else if (getSkillMatch(state, project, student) != null) {
+		}
+		else if (getSkillMatch(state, project, student) != null) {
 			score += SKILL_MATCH;
-		} else if (getRoleMatch(state, project, student) != null) {
+		}
+		else if (getRoleMatch(state, project, student) != null) {
 			score += ROLE_MATCH;
 		}
 		
 		return score;
 	}
 	
-	private List<ProjectScoresData> calculateScores(TeamFormationState state) {
+	/**
+	 * Calculate the total fitness scores of each student for each project.
+	 * The total fitness score is the addition of the score based on students' preferences on projects
+	 * and another based on role requirement / preferences
+	 * 
+	 * @param state
+	 * @return - the result of all calculations, as a list of ProjectScoresData
+	 */
+	private Collection<ProjectScoresData> calculateScores(TeamFormationState state) {
 		List<ProjectScoresData> scoresDataList = new ArrayList<>();
-		
 		Collection<Project> allProjects = state.getRemainingProjects();
 		Collection<Student> allStudents = state.getRemainingStudents();
 		
+		// calculate score of each remaining student for each remaining project 
 		for (Project project : allProjects) {
 			ProjectScoresData scoresData = new ProjectScoresData(project);
 			
@@ -235,39 +300,90 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	/**
-	 * assign the student into the project if the assignment is valid
+	 * assign the student into the project
+	 * @param state
 	 * @param project
 	 * @param student
-	 * @return - whether assignment was successful
 	 */
 	private void assign(TeamFormationState state, Project project, Student student) {
-		// if the project has no member yet, or if assigning the student meets requirement
-		if (project.getStudents().isEmpty() || (validator.validateHardConstraints(project, student))) {
-			project.addStudent(student);
-			connection.saveProject(project);
-			
-			state.removeStudent(student);
-			state.updateProject(project);
-		}
+		project.addStudent(student);
+		connection.saveProject(project);
+		state.removeStudent(student);
+		state.updateProject(project);
 	}
 	
+	/**
+	 * Validate if the student can be assigned into the project satisfying hard constraints 
+	 * @param project
+	 * @param student
+	 * @return - whether the assignment is valid
+	 */
+	private boolean validateAssignment(Project project, Student student) {
+		return (project.getStudents().isEmpty() || validator.validateHardConstraints(project, student));
+	}
 	
-	private void assignToRole(TeamFormationState state, Project project, Student student) {
+	/**
+	 * Assignment action called in assignStudentsPhase1() method.
+	 * The student is assigned to the project only if the project has a Role that is preferred by the student,
+	 * while also meeting hard constraints.
+	 * 
+	 * @param state
+	 * @param project
+	 * @param student
+	 */
+	private void assignForPhase1(TeamFormationState state, Project project, Student student) {
 		RoleRequirement roleMatch = getRoleMatch(state, project, student);
 		
 		if (roleMatch != null) {
-			assign(state, project, student);
-			state.removeRoleRequirement(project.getId(), roleMatch);
+			if (validateAssignment(project, student)) {
+				assign(state, project, student);
+				state.removeRoleRequirement(project.getId(), roleMatch);
+			}
 		}
 	}
 	
-	private void assignStudentsToRole(TeamFormationState state) throws InsufficientProjectsException, NoStudentException {
+	/**
+	 * Assignment action called in assignStudentsPhase2() method.
+	 * The student is assigned to the project regardless of the project's role requirement,
+	 * if the hard constrains are met.
+	 * 
+	 * @param state
+	 * @param project
+	 * @param student
+	 */
+	private void assignForPhase2(TeamFormationState state, Project project, Student student) {
+		RoleRequirement roleMatch = getRoleMatch(state, project, student);
+		
+		if (validateAssignment(project, student)) {
+			assign(state, project, student);
+			
+			if (roleMatch != null) {
+				state.removeRoleRequirement(project.getId(), roleMatch);
+			}
+		}
+	}
+	
+	/**
+	 * The first phase of assigning students.
+	 * 
+	 * Attempts to assign students into projects ensuring that the role requirements of projects
+	 * as well as hard constraints are met
+	 * 
+	 * Students with higher 'score' for project (higher match to the project considering preferences and
+	 * requirements) are assigned prior to others, as long as role requirement and hard constraints
+	 * are satisfied.
+	 * 
+	 * @param state
+	 * @throws InsufficientProjectsException
+	 * @throws InsufficientStudentsException
+	 */
+	private void assignStudentsPhase1(TeamFormationState state) throws InsufficientProjectsException, InsufficientStudentsException {
 		Collection<Student> students = state.getRemainingStudents();
 		Collection<Project> projects = state.getRemainingProjects();
 		
 		// there's no student to form team
 		if (students.size() == 0) {
-			throw new NoStudentException();
+			throw new InsufficientStudentsException();
 		} 
 		
 		// not enough number of projects for all students
@@ -275,7 +391,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			throw new InsufficientProjectsException();
 		}
 		
-		List<ProjectScoresData> scoresDataList = calculateScores(state);
+		Collection<ProjectScoresData> scoresDataList = calculateScores(state);
 		
 		
 		// for each project scores data (each student's score for the project)
@@ -297,14 +413,26 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				// check if the student has not been assigned
 				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
-					assignToRole(state, project, student);
+					assignForPhase1(state, project, student);
 				}
 			}
 		}
 	}
 	
-	private void assignStudents(TeamFormationState state) {
-		List<ProjectScoresData> scoresDataList = calculateScores(state);
+	/**
+	 * The second phase of assigning students.
+	 * 
+	 * Attempts to assign students into projects ensuring hard constraints are met.
+	 * 
+	 * Students with higher 'score' for project (higher match to the project considering preferences and
+	 * requirements) are assigned prior to others as long as hard constraints are satisfied.
+	 * 
+	 * @param state
+	 * @throws InsufficientProjectsException
+	 * @throws InsufficientStudentsException
+	 */
+	private void assignStudentsPhase2(TeamFormationState state) {
+		Collection<ProjectScoresData> scoresDataList = calculateScores(state);
 		
 		// for each project scores data (each student's score for the project)
 		for (ProjectScoresData scoresData : scoresDataList) {
@@ -325,10 +453,22 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				// check if the student has not been assigned
 				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
-					assign(state, project, student);
+					assignForPhase2(state, project, student);
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Wrapper method for the phase 1 and 2 of assignment
+	 * 
+	 * @param state
+	 * @throws InsufficientProjectsException
+	 * @throws InsufficientStudentsException
+	 */
+	private void assignStudents(TeamFormationState state) throws InsufficientProjectsException, InsufficientStudentsException {
+		assignStudentsPhase1(state);
+		assignStudentsPhase2(state);
 	}
 
 	/**
@@ -342,12 +482,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		for (Student student : students) {
 			for (Project project : projects) {
 				if ((project.getStudents().size() < Project.TEAM_CAPACITY)) {
-					project.addStudent(student);
-					connection.saveProject(project);
-					
-					state.removeStudent(student);
-					state.updateProject(project);
-					
+					assign(state, project, student);
 					break;
 				}
 			}
@@ -355,7 +490,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public boolean assignStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException {
+	public boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
 		// projects to which students are to be assigned
 		Collection<Project> candidateProjects = getPopularProjects();
 		Collection<Student> femaleStudents = connection.getFemaleStudents();
@@ -363,12 +498,10 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		// assign female students first
 		TeamFormationState state = new TeamFormationState(femaleStudents, candidateProjects);
-		assignStudentsToRole(state);
 		assignStudents(state);
 		
 		// assign male students
 		state.addStudents(maleStudents);
-		assignStudentsToRole(state);
 		assignStudents(state);
 		
 		// assign remaining students to any project with vacancy

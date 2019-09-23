@@ -3,7 +3,7 @@ package interfaces;
 import java.util.Collection;
 
 import model.teamFormation.InsufficientProjectsException;
-import model.teamFormation.NoStudentException;
+import model.teamFormation.InsufficientStudentsException;
 import model.teamFormation.RemainedStudentsException;
 
 public interface ProjectTeamsFormationSystem {
@@ -13,9 +13,9 @@ public interface ProjectTeamsFormationSystem {
 	 * get popular projects as a list of Projects
 	 * the number of popular projects equals to the number of teams to be formed
 	 * @return - list of Projects
-	 * @throws NoStudentException 
+	 * @throws InsufficientStudentsException 
 	 */
-	Collection<Project> getPopularProjects() throws NoStudentException;
+	Collection<Project> getPopularProjects() throws InsufficientStudentsException;
 	
 	Collection<String> getPopularProjectDescs();
 	
@@ -33,10 +33,10 @@ public interface ProjectTeamsFormationSystem {
 	/**
 	 * assign all students into projects
 	 * @return - true if all students are successfully assigned to projects
-	 * @throws NoStudentException 
+	 * @throws InsufficientStudentsException 
 	 * @throws InsufficientProjectsException 
 	 * @throws RemainedStudentsException 
 	 */
-	boolean assignStudents() throws InsufficientProjectsException, NoStudentException, RemainedStudentsException;
+	boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
 }
