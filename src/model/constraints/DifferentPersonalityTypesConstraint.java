@@ -1,7 +1,7 @@
 package model.constraints;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import interfaces.Project;
@@ -18,7 +18,7 @@ public class DifferentPersonalityTypesConstraint extends SoftConstraint {
 	
 	@Override
 	public boolean validateAdd(Project project, Student student) {
-		List<Student> members = (List<Student>)project.getStudents();
+		Collection<Student> members = project.getStudents();
 		PersonalityType studentType = student.getPersonalityType();
 
 		for (Student member : members) {

@@ -16,8 +16,7 @@ public class PersonalityAorBConstraint extends SoftConstraint {
 	public boolean validateAdd(Project project, Student student) {
 		if (!validate(project)) {
 			PersonalityType type = student.getPersonalityType();
-			
-			return (type.equals(PersonalityType.A) || type.equals(PersonalityType.B)) ? true : false;
+			return (type.equals(PersonalityType.A) || type.equals(PersonalityType.B));
 		}
 		return true;
 	}

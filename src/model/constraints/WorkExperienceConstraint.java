@@ -1,6 +1,6 @@
 package model.constraints;
 
-import java.util.List;
+import java.util.Collection;
 
 import interfaces.Project;
 import interfaces.Student;
@@ -19,14 +19,14 @@ public class WorkExperienceConstraint extends SoftConstraint {
 	@Override
 	public boolean validateAdd(Project project, Student student) {
 		if (!validate(project)) {
-			return (student.getGpa() >= EXPERIENCE) ? true : false;
+			return (student.getGpa() >= EXPERIENCE);
 		}
 		return true;
 	}
 	
 	@Override
 	public boolean validate(Project project) {
-		List<Student> students = (List<Student>)project.getStudents();
+		Collection<Student> students = project.getStudents();
 		
 		for (Student member : students) {
 			if (member.getGpa() >= EXPERIENCE) {
