@@ -23,7 +23,7 @@ public class GenderConstraint extends AbstractConstraint {
 	}
 	
 	@Override
-	public boolean validate(Project project, Student student) {
+	public boolean validateAdd(Project project, Student student) {
 		if (student.getGender() == Gender.FEMALE) {
 			return !teamContainsFemale(project);
 		}

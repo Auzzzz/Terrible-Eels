@@ -38,7 +38,7 @@ public class AverageGPAConstraint extends AbstractConstraint {
 	}
 	
 	@Override
-	public boolean validate(Project project, Student student) {
+	public boolean validateAdd(Project project, Student student) {
 		Collection<Student> members = project.getStudents();
 		int count = members.size();
 		

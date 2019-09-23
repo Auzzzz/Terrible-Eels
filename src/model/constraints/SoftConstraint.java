@@ -20,7 +20,7 @@ public abstract class SoftConstraint extends AbstractConstraint {
 	}
 	
 	@Override
-	public abstract boolean validate(Project project, Student student);
+	public abstract boolean validateAdd(Project project, Student student);
 	
 	@Override
 	public abstract boolean validate(Project project);

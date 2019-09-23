@@ -17,7 +17,7 @@ public class WorkExperienceConstraint extends SoftConstraint {
 	}
 	
 	@Override
-	public boolean validate(Project project, Student student) {
+	public boolean validateAdd(Project project, Student student) {
 		if (!validate(project)) {
 			return (student.getGpa() >= EXPERIENCE) ? true : false;
 		}

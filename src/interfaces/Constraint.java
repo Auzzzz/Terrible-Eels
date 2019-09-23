@@ -19,7 +19,7 @@ public interface Constraint {
 	 * @param student 
 	 * @return - true if validated
 	 */
-	boolean validate(Project project, Student student);
+	boolean validateAdd(Project project, Student student);
 	
 	/**
 	 * validate whether members of the project meet the constraint

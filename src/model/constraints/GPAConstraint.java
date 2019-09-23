@@ -39,7 +39,7 @@ public class GPAConstraint extends AbstractConstraint {
 	}
 	
 	@Override
-	public boolean validate(Project project, Student student) {
+	public boolean validateAdd(Project project, Student student) {
 		Collection<Student> members = project.getStudents();
 		int memberCount = members.size();
 		int gpaThreeCount = countGPAThree(members);  // number of members with GPA > 3.0

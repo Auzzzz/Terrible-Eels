@@ -67,7 +67,7 @@ public class ValidatorImpl implements Validator {
 	public boolean validateHardConstraints(Project project, Student student) {
 		// if adding the student violates any hard constraint he cannot join the project
 		for (Constraint constraint : connection.getAllHardConstraints()) {
-			if (!(constraint.validate(project, student))) {
+			if (!(constraint.validateAdd(project, student))) {
 				return false;
 			}
 		}

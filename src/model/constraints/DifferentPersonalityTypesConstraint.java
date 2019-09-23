@@ -17,7 +17,7 @@ public class DifferentPersonalityTypesConstraint extends SoftConstraint {
 	}
 	
 	@Override
-	public boolean validate(Project project, Student student) {
+	public boolean validateAdd(Project project, Student student) {
 		List<Student> members = (List<Student>)project.getStudents();
 		PersonalityType studentType = student.getPersonalityType();
 

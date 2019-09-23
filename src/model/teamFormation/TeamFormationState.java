@@ -22,7 +22,7 @@ import model.RoleRequirement;
 public class TeamFormationState {
 	private Map<String, Student> remainingStudents = new HashMap<>();
 	private Map<String, Project> remainingProjects = new LinkedHashMap<>();
-	private Map<String, Set<RoleRequirement>> roleRequirements = new HashMap<>();
+	private Map<String, Collection<RoleRequirement>> roleRequirements = new HashMap<>();
 	private Collection<Project> formedProjects = new ArrayList<>();
 	
 	public TeamFormationState(Collection<Student> remainingStudents, Collection<Project> remainingProjects) {
@@ -32,7 +32,7 @@ public class TeamFormationState {
 		
 		for (Project project : remainingProjects) {
 			(this.remainingProjects).put(project.getId(), project);
-			(this.roleRequirements).put(project.getId(), (Set<RoleRequirement>) project.getRoleRequirements());
+			(this.roleRequirements).put(project.getId(), project.getRoleRequirements());
 		}
 	}
 	
@@ -63,11 +63,11 @@ public class TeamFormationState {
 	}
 	
 	public void removeRoleRequirement(String projectId, RoleRequirement roleReq) {
-		Set<RoleRequirement> roleRequirementsList = roleRequirements.get(projectId);
-		roleRequirementsList.remove(roleReq);
+		Collection<RoleRequirement> roleReqCollection = roleRequirements.get(projectId);
+		roleReqCollection.remove(roleReq);
 	}
 	
-	public Set<RoleRequirement> getRoleRequirements(Project project) {
+	public Collection<RoleRequirement> getRoleRequirements(Project project) {
 		return roleRequirements.get(project.getId());
 	}
 	
