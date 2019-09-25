@@ -2,6 +2,8 @@ package interfaces;
 
 import java.util.Collection;
 
+import model.constraints.SoftConstraint;
+
 public interface SQLConnection {
 	int getStudentCount();
 	
@@ -13,11 +15,13 @@ public interface SQLConnection {
 	
 	Collection<Constraint> getAllHardConstraints();
 	
-	Collection<Constraint> getAllSoftConstraints();
+	Collection<SoftConstraint> getAllSoftConstraints();
 	
 	Collection<Student> getFemaleStudents();
 	
 	Collection<Student> getMaleStudents();
+	
+	Collection<Student> getOtherStudents();
 	
 	Collection<Project> getPopularProjects(int idealNumberOfProjects);
 	
