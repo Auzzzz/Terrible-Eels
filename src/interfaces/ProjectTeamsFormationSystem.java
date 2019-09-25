@@ -2,6 +2,7 @@ package interfaces;
 
 import java.util.Collection;
 
+import model.RoleRequirement;
 import model.teamFormation.InsufficientProjectsException;
 import model.teamFormation.InsufficientStudentsException;
 import model.teamFormation.RemainedStudentsException;
@@ -38,5 +39,7 @@ public interface ProjectTeamsFormationSystem {
 	 * @throws RemainedStudentsException 
 	 */
 	boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+
+	void addProject(String desc, Collection<RoleRequirement> roles);
 
 }

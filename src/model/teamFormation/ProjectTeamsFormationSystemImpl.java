@@ -515,4 +515,9 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		
 		return (state.getRemainingStudents().size() == 0);
 	}
+
+	@Override
+	public void addProject(String desc, Collection<RoleRequirement> roles) {
+		connection.saveProject(new ProjectImpl("1", desc, roles));
+	}
 }

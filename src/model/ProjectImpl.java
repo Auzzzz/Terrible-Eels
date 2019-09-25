@@ -3,10 +3,9 @@ package model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 import interfaces.Project;
 import interfaces.Student;
+import model.exceptions.TooManyRolesException;
 
 public class ProjectImpl implements Project {
 
@@ -15,10 +14,15 @@ public class ProjectImpl implements Project {
 	String projectId;
 	String description;
 
-	public ProjectImpl(String projectId, String description, Collection<RoleRequirement> roles) {
+	public ProjectImpl(String projectId, String description, Collection<RoleRequirement> roles)
+			throws TooManyRolesException {
 		this.projectId = projectId;
 		this.description = description;
-		this.rolesReq = (ArrayList<RoleRequirement>) roles;
+		if (roles.size() > 4) {
+			new TooManyRolesException();
+		} else {
+			this.rolesReq = (ArrayList<RoleRequirement>) roles;
+		}
 	}
 
 	@Override
