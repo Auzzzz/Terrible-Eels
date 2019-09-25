@@ -1,5 +1,6 @@
 package interfaces;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -24,5 +25,5 @@ public interface Student {
 		
 	PersonalityType getPersonalityType();
 
-	Set<RoleRequirement> getRolePreferences(); 
+	Collection<RoleRequirement> getRolePreferences(); 
 }

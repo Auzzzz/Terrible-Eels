@@ -20,9 +20,9 @@ public class ValidatorImpl implements Validator {
 	@Override
 	public int calculateFit(Project project) {
 		int result = 0;
-		for (Constraint c : connection.getAllSoftConstraints()) {
+		for (SoftConstraint c : connection.getAllSoftConstraints()) {
 			if (c.validate(project)) {
-				result += 1 * ((SoftConstraint) c).getWeight();
+				result += 1 * c.getWeight();
 			}
 		}
 		return result;
@@ -46,7 +46,7 @@ public class ValidatorImpl implements Validator {
 	public Constraint getConstraint(String desc) {
 		
 		ArrayList<Constraint> hardConstraints = (ArrayList<Constraint>) connection.getAllHardConstraints();
-		ArrayList<Constraint> softConstraints = (ArrayList<Constraint>) connection.getAllSoftConstraints();
+		ArrayList<SoftConstraint> softConstraints = (ArrayList<SoftConstraint>) connection.getAllSoftConstraints();
 		
 		for(Constraint c : hardConstraints) {
 			if(c.getDescription().equalsIgnoreCase(desc)) {
@@ -65,7 +65,6 @@ public class ValidatorImpl implements Validator {
 
 	@Override
 	public boolean validateHardConstraints(Project project, Student student) {
-		// if adding the student violates any hard constraint he cannot join the project
 		for (Constraint constraint : connection.getAllHardConstraints()) {
 			if (!(constraint.validateAdd(project, student))) {
 				return false;
@@ -81,7 +80,6 @@ public class ValidatorImpl implements Validator {
 				return false;
 			}
 		}
-		
 		return true;
 	}
 }

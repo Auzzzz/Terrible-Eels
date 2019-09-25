@@ -9,6 +9,7 @@ import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
 import model.ProjectImpl;
+import model.constraints.SoftConstraint;
 
 public class SQLConnectionImpl implements SQLConnection {
 	private static Connection conn = null;
@@ -97,7 +98,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public Collection<Constraint> getAllSoftConstraints() {
+	public Collection<SoftConstraint> getAllSoftConstraints() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -110,6 +111,12 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public Collection<Student> getMaleStudents() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Collection<Student> getOtherStudents() {
 		// TODO Auto-generated method stub
 		return null;
 	}
