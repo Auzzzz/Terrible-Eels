@@ -70,7 +70,7 @@ public class StudentImpl implements Student {
 	}
 
 	@Override
-	public Set<RoleRequirement> getRolePreferences() {
+	public Collection<RoleRequirement> getRolePreferences() {
 		// TODO Auto-generated method stub
 		return null;
 	}

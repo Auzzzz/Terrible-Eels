@@ -2,11 +2,16 @@ package model.teamFormation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+
 import enums.Skill;
 import interfaces.*;
 import model.ProjectImpl;
 import model.RoleRequirement;
+import model.constraints.SoftConstraint;
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
 	private SQLConnection connection;
@@ -199,7 +204,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	 * @param student
 	 * @return - fitness score of the student for the project
 	 */
-	private int calculatePreferenceScore(Project project, Student student) {
+	private int calcProjectPreferenceScore(Project project, Student student) {
 		// fitness values
 		final int FIRST_PREFERENCE = 10;
 		final int SECOND_PREFERENCE = 7;
@@ -208,11 +213,12 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		int score = 0;
 		List<String> preferences = student.getProjectPreferences();
 		int preferencesSize = preferences.size();
+		String projectId = project.getId();
 		
 		for (int i = 0; i < preferencesSize; i++) {
 			String preference = preferences.get(i);
-			String projectId = project.getId();
 			
+			// if the project is the student's preference
 			if (projectId.equals(preference)) {
 				switch(i) {
 					case 0:
@@ -248,7 +254,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	 * @param student
 	 * @return - fitness score of the student for the project
 	 */
-	private int calculateRoleRequirementScore(Project project, Student student, TeamFormationState state) {
+	private int calcRoleRequirementScore(Project project, Student student, TeamFormationState state) {
 		// fitness values
 		final int ROLE_SKILL_MATCH = 10;
 		final int SKILL_MATCH = 9;
@@ -269,6 +275,27 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	/**
+	 * calculate the student's 'fitness score' for the project based on soft constraints;
+	 * if addition of the student satisfies a soft constraint, its weight is added to the score 
+	 * 
+	 * @param project
+	 * @param student
+	 * @return - fitness score of the student for the project
+	 */
+	private int calcSoftConstraintScore(Project project, Student student) {
+		int score = 0;
+		
+		for (SoftConstraint constraint : connection.getAllSoftConstraints()) {
+			// if addition of the student to the project satisfies soft constraint
+			if (constraint.validateAdd(project, student)) {
+				score += constraint.getWeight();
+			}
+		}
+		
+		return score;
+	}
+	
+	/**
 	 * Calculate the total fitness scores of each student for each project.
 	 * The total fitness score is the addition of the score based on students' preferences on projects
 	 * and another based on role requirement / preferences
@@ -276,20 +303,21 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	 * @param state
 	 * @return - the result of all calculations, as a list of ProjectScoresData
 	 */
-	private Collection<ProjectScoresData> calculateScores(TeamFormationState state) {
+	private Collection<ProjectScoresData> calcScores(TeamFormationState state) {
 		List<ProjectScoresData> scoresDataList = new ArrayList<>();
-		Collection<Project> allProjects = state.getRemainingProjects();
-		Collection<Student> allStudents = state.getRemainingStudents();
+		Collection<Project> remainingProjects = state.getRemainingProjects();
+		Collection<Student> remainingStudents = state.getRemainingStudents();
 		
-		// calculate score of each remaining student for each remaining project 
-		for (Project project : allProjects) {
+		// calculate score of each student for each project 
+		for (Project project : remainingProjects) {
 			ProjectScoresData scoresData = new ProjectScoresData(project);
 			
-			for (Student student : allStudents) {
-				int preferenceScore = calculatePreferenceScore(project, student);
-				int roleRequirementScore = calculateRoleRequirementScore(project, student, state);
+			for (Student student : remainingStudents) {
+				int projectPrefScore = calcProjectPreferenceScore(project, student);
+				int roleReqScore = calcRoleRequirementScore(project, student, state);
+				int softConstScore = calcSoftConstraintScore(project, student);
 				
-				StudentScore studentScore = new StudentScore(student, preferenceScore+roleRequirementScore);
+				StudentScore studentScore = new StudentScore(student, projectPrefScore + roleReqScore + softConstScore);
 				scoresData.addStudentScore(studentScore);
 			}
 			
@@ -365,10 +393,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	
 	/**
 	 * The first phase of assigning students.
-	 * 
 	 * Attempts to assign students into projects ensuring that the role requirements of projects
-	 * as well as hard constraints are met
-	 * 
+	 * as well as hard constraints are met.
 	 * Students with higher 'score' for project (higher match to the project considering preferences and
 	 * requirements) are assigned prior to others, as long as role requirement and hard constraints
 	 * are satisfied.
@@ -381,36 +407,34 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		Collection<Student> students = state.getRemainingStudents();
 		Collection<Project> projects = state.getRemainingProjects();
 		
-		// there's no student to form team
-		if (students.size() == 0) {
+		// not enough students to form a team
+		if (students.size() < Project.TEAM_CAPACITY) {
 			throw new InsufficientStudentsException();
 		} 
 		
-		// not enough number of projects for all students
+		// not enough projects for all students
 		if ((students.size() / Project.TEAM_CAPACITY) > projects.size()) {
 			throw new InsufficientProjectsException();
 		}
 		
-		Collection<ProjectScoresData> scoresDataList = calculateScores(state);
+		// data of all student's score for each project
+		Collection<ProjectScoresData> scoresData = calcScores(state);
 		
-		
-		// for each project scores data (each student's score for the project)
-		for (ProjectScoresData scoresData : scoresDataList) {
-			Project project = scoresData.getProject();
+		// for each project, check all the students' scores for the project
+		for (ProjectScoresData scoresForProject : scoresData) {
+			Project project = scoresForProject.getProject();
 			
-			// traverse through sorted collection of StudentScore objects for this project
-			for (StudentScore score : scoresData.getStudentScores()) {
+			// consider each student in the order of score
+			for (StudentScore score : scoresForProject.getStudentScores()) {
 				
-				// check if the project team has been formed
+				// if the project team has been formed
 				Project remainingProject = state.getRemainingProject(project.getId());
 				if ((remainingProject == null)) {
 					break;
 				}
 				
-				// students with higher score are first considered
+				// if the student has not been assigned
 				Student student = score.getStudent();
-			
-				// check if the student has not been assigned
 				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
 					assignForPhase1(state, project, student);
@@ -421,9 +445,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	
 	/**
 	 * The second phase of assigning students.
-	 * 
 	 * Attempts to assign students into projects ensuring hard constraints are met.
-	 * 
 	 * Students with higher 'score' for project (higher match to the project considering preferences and
 	 * requirements) are assigned prior to others as long as hard constraints are satisfied.
 	 * 
@@ -432,25 +454,24 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	 * @throws InsufficientStudentsException
 	 */
 	private void assignStudentsPhase2(TeamFormationState state) {
-		Collection<ProjectScoresData> scoresDataList = calculateScores(state);
+		// data of all student's score for each project
+		Collection<ProjectScoresData> scoresData = calcScores(state);
 		
-		// for each project scores data (each student's score for the project)
-		for (ProjectScoresData scoresData : scoresDataList) {
-			Project project = scoresData.getProject();
+		// for each project, check all the students' scores for the project
+		for (ProjectScoresData scoresForProject : scoresData) {
+			Project project = scoresForProject.getProject();
 			
-			// traverse through sorted collection of StudentScore objects for this project
-			for (StudentScore score : scoresData.getStudentScores()) {
+			// consider each student in the order of score
+			for (StudentScore score : scoresForProject.getStudentScores()) {
 				
-				// check if the project team has been formed
+				// if the project team has been formed
 				Project remainingProject = state.getRemainingProject(project.getId());
 				if ((remainingProject == null)) {
 					break;
 				}
 				
-				// students with higher score are first considered
+				// if the student has not been assigned
 				Student student = score.getStudent();
-			
-				// check if the student has not been assigned
 				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
 					assignForPhase2(state, project, student);
@@ -460,7 +481,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	/**
-	 * Wrapper method for the phase 1 and 2 of assignment
+	 * Wrapper method for the assignment phase 1 and 2 
 	 * 
 	 * @param state
 	 * @throws InsufficientProjectsException
@@ -472,7 +493,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	/**
-	 * assign remaining students to any project with vacancy ignoring hard constraints
+	 * assign remaining students to any vacant project regardless of hard constraints
 	 * @param state
 	 */
 	private void forceAssign(TeamFormationState state) {
@@ -491,26 +512,28 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	
 	@Override
 	public boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
-		// projects to which students are to be assigned
 		Collection<Project> candidateProjects = getPopularProjects();
-		Collection<Student> femaleStudents = connection.getFemaleStudents();
-		Collection<Student> maleStudents = connection.getMaleStudents();
+		List<Student> female = new LinkedList<>(connection.getFemaleStudents());
+		List<Student> other = new LinkedList<>(connection.getMaleStudents());
+		other.addAll(connection.getOtherStudents());
 		
-		// assign female students first
-		TeamFormationState state = new TeamFormationState(femaleStudents, candidateProjects);
+		// shuffle students to get different resulting teams each time assignStudents() is called
+		Collections.shuffle(female, new Random(System.currentTimeMillis()));
+		Collections.shuffle(other, new Random(System.currentTimeMillis()));
+		
+		// assign female students and then others
+		TeamFormationState state = new TeamFormationState(female, candidateProjects);
+		assignStudents(state);
+		state.addStudents(other);
 		assignStudents(state);
 		
-		// assign male students
-		state.addStudents(maleStudents);
-		assignStudents(state);
-		
-		// assign remaining students to any project with vacancy
+		// assign remaining students to any vacant project
 		forceAssign(state);
 		
-		// there will be remained students if the number of students is not divisible by team capacity
-		Collection<Student> remained = state.getRemainingStudents();
-		if (remained.size() > 0) {
-			throw new RemainedStudentsException(remained);
+		// student(s) will remain if the number of all students is not divisible by team capacity
+		Collection<Student> remaineders = state.getRemainingStudents();
+		if (remaineders.size() > 0) {
+			throw new RemainedStudentsException(remaineders);
 		}
 		
 		return (state.getRemainingStudents().size() == 0);
