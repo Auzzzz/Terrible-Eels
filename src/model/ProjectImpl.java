@@ -18,7 +18,7 @@ public class ProjectImpl implements Project {
 			throws TooManyRolesException {
 		this.projectId = projectId;
 		this.description = description;
-		if (roles.size() > 4) {
+		if (roles.size() > 4) { 
 			new TooManyRolesException();
 		} else {
 			this.rolesReq = (ArrayList<RoleRequirement>) roles;
