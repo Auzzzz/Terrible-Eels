@@ -6,6 +6,7 @@ import java.util.HashMap;
 import interfaces.Project;
 import interfaces.Student;
 import model.exceptions.TooManyRolesException;
+import model.exceptions.TooManyStudentsException;
 
 public class ProjectImpl implements Project {
 
@@ -18,8 +19,8 @@ public class ProjectImpl implements Project {
 			throws TooManyRolesException {
 		this.projectId = projectId;
 		this.description = description;
-		if (roles.size() > 4) { 
-			new TooManyRolesException();
+		if (roles.size() > 4) {
+			throw new TooManyRolesException();
 		} else {
 			this.rolesReq = (ArrayList<RoleRequirement>) roles;
 		}
@@ -46,12 +47,15 @@ public class ProjectImpl implements Project {
 	}
 
 	@Override
-	public void addStudent(Student student) {
-		students.put(student.getStudentNo(), student);
+	public void addStudent(Student student) throws TooManyStudentsException {
+		if (students.size() < 4) {
+			students.put(student.getStudentNo(), student);
+		} else {
+			throw new TooManyStudentsException();
+		}
 	}
 
 	@Override
-
 	public Collection<RoleRequirement> getRoleRequirements() {
 		return rolesReq;
 	}

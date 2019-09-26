@@ -1,11 +1,8 @@
 package interfaces;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-
 import model.RoleRequirement;
+import model.exceptions.TooManyStudentsException;
 
 public interface Project {
 	static final int TEAM_CAPACITY = 4;
@@ -16,7 +13,7 @@ public interface Project {
 	
 	Collection<Student> getStudents();
 	
-	void addStudent(Student student);
+	void addStudent(Student student) throws TooManyStudentsException;
 	
 	boolean removeStudent(Student student);
 
