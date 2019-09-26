@@ -2,8 +2,6 @@ package model;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-
 import enums.Role;
 import enums.Skill;
 

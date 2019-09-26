@@ -2,8 +2,6 @@ package interfaces;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-
 import enums.Gender;
 import enums.PersonalityType;
 import model.RoleRequirement;

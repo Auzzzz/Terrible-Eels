@@ -1,8 +1,6 @@
 package model.constraints;
 
 import java.util.Collection;
-import java.util.List;
-
 import interfaces.Project;
 import interfaces.Student;
 
