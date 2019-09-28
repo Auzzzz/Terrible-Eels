@@ -531,12 +531,12 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		forceAssign(state);
 		
 		// student(s) will remain if the number of all students is not divisible by team capacity
-		Collection<Student> remaineders = state.getRemainingStudents();
-		if (remaineders.size() > 0) {
-			throw new RemainedStudentsException(remaineders);
+		Collection<Student> remainders = state.getRemainingStudents();
+		if (remainders.size() > 0) {
+			throw new RemainedStudentsException(remainders);
 		}
 		
-		return (state.getRemainingStudents().size() == 0);
+		return (remainders.size() == 0);
 	}
 
 	@Override
