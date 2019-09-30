@@ -57,7 +57,6 @@ public class Menu {
 			System.out.println("Press 1 to Enter Project Preferences");
 			System.out.println("Press 2 to Blacklist Members");
 			System.out.println("Press 3 to Specify Preferred Roles");
-			System.out.println("Press 4 to Specify Skills");
 			System.out.println("Press 5 to exit");
 			System.out.println("*******************************************");
 
@@ -65,15 +64,12 @@ public class Menu {
 
 			switch (input) {
 			case "1":
-
+				System.out.println(listProjects());
 				break;
 			case "2":
 
 				break;
 			case "3":
-
-				break;
-			case "4":
 
 				break;
 			case "5":
@@ -146,6 +142,15 @@ public class Menu {
 			}
 		}
 
+	}
+
+	private String listProjects() {
+		String details = "";
+		int i = 0;
+		for(String s: system.getAllProjectDescs()) {
+			details += i++ + " " + s;
+		}
+		return details;
 	}
 
 	private Collection<RoleRequirement> promptRoles(Scanner scanner) {
