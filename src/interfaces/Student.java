@@ -7,8 +7,17 @@ import enums.PersonalityType;
 import model.RoleRequirement;
 
 public interface Student {
+	
+	/**
+	 * gets the student's id
+	 * @return
+	 */
 	String getStudentNo();
 	
+	/**
+	 * gets the student's name
+	 * @return
+	 */
 	String getName();
 	
 	/**
@@ -17,11 +26,27 @@ public interface Student {
 	 */
 	List<String> getProjectPreferences();
 	
+	/**
+	 * gets the student's gpa
+	 * @return
+	 */
 	double getGpa();
 	
+	/**
+	 * gets the student's gender
+	 * @return
+	 */
 	Gender getGender();
 		
+	/**
+	 * gets the student's personality type
+	 * @return
+	 */
 	PersonalityType getPersonalityType();
 
+	/**
+	 * gets the students's preferred roles and skills
+	 * @return - a collection of RoleRequirements
+	 */
 	Collection<RoleRequirement> getRolePreferences(); 
 }

@@ -40,6 +40,33 @@ public interface ProjectTeamsFormationSystem {
 	 */
 	boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
+	/**
+	 * adds a project to the database
+	 * @param desc
+	 * @param roles
+	 */
 	void addProject(String desc, Collection<RoleRequirement> roles);
+	
+	/**
+	 * sets the preferences of a student
+	 * @param student
+	 * @param projects
+	 */
+	void setPreferences(Student student, Collection<Project> projects);
+	
+	/**
+	 * sets the blacklist of a student
+	 * @param student
+	 * @param students
+	 */
+	void setBlacklist(Student student, Collection<Student> students);
 
+	/**
+	 * sets the roles of a student
+	 * @param student
+	 * @param roles
+	 */
+	void setRoles(Student student, Collection<RoleRequirement> roles);
+	
+	
 }

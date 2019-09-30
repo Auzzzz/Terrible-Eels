@@ -121,11 +121,7 @@ public class SQLConnectionImpl implements SQLConnection {
 		return null;
 	}
 
-	/**
-	 * get the id of popular projects as a list of String
-	 * @param idealNumberOfProject
-	 * @return - list of project IDs
-	 */
+	
 	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
 		List<String> projectIds = new ArrayList<>();
 		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + idealNumberOfProject + ";";
