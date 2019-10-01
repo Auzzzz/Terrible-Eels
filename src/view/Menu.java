@@ -42,14 +42,14 @@ public class Menu {
 
 			if (username.equals(Username) && password.equals(Password)) {
 				System.out.println("You are now logged in " + Username);
-				displayMenu(input, scanner);
+				displayMenu(username, input, scanner);
 			} else {
 				System.out.println("Invalid Username and Password" + Username + Password);
 			}
 		}
 	}
 
-	private void displayMenu(String user, Scanner scanner) {
+	private void displayMenu(String username, String user, Scanner scanner) {
 		String input = " ";
 
 		while (user.compareTo("student") == 0) {
@@ -57,22 +57,44 @@ public class Menu {
 			System.out.println("Press 1 to Enter Project Preferences");
 			System.out.println("Press 2 to Blacklist Members");
 			System.out.println("Press 3 to Specify Preferred Roles");
-			System.out.println("Press 5 to exit");
+			System.out.println("Press 4 to exit");
 			System.out.println("*******************************************");
 
 			input = scanner.nextLine();
 
 			switch (input) {
 			case "1":
-				System.out.println(listProjects());
+				ArrayList<String> projects = (ArrayList<String>) system.getAllProjectDescs();
+				ArrayList<String> preferences = new ArrayList<String>();
+				
+				for(int i = 0; i < projects.size(); i++) {
+					System.out.println(i + " " + projects.get(i));
+				}
+				
+				System.out.println("Please enter your first preference");
+				preferences.add(projects.get(scanner.nextInt()-1));
+				
+				System.out.println("Please enter your second preference");
+				preferences.add(projects.get(scanner.nextInt()-1));
+				
+				System.out.println("Please enter your third preference");
+				preferences.add(projects.get(scanner.nextInt()-1));
+				
+				System.out.println("Please enter your fourth preference");
+				preferences.add(projects.get(scanner.nextInt()-1));
+				system.setPreferences(username, preferences);
+				
 				break;
 			case "2":
-
+				
+				System.out.println("Please enter the student number of the student you would like to blacklist:");
+				
+				system.addToBlacklist(username, scanner.nextLine());
 				break;
 			case "3":
 
 				break;
-			case "5":
+			case "4":
 				user = "exit";
 				break;
 			default:
@@ -142,15 +164,6 @@ public class Menu {
 			}
 		}
 
-	}
-
-	private String listProjects() {
-		String details = "";
-		int i = 0;
-		for(String s: system.getAllProjectDescs()) {
-			details += i++ + " " + s;
-		}
-		return details;
 	}
 
 	private Collection<RoleRequirement> promptRoles(Scanner scanner) {

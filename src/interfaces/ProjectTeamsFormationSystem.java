@@ -18,6 +18,10 @@ public interface ProjectTeamsFormationSystem {
 	 */
 	Collection<Project> getPopularProjects() throws InsufficientStudentsException;
 	
+	/**
+	 * gets the most popular projects
+	 * @return
+	 */
 	Collection<String> getPopularProjectDescs();
 	
 	/**
@@ -49,24 +53,24 @@ public interface ProjectTeamsFormationSystem {
 	
 	/**
 	 * sets the preferences of a student
-	 * @param student
-	 * @param projects
+	 * @param studentID
+	 * @param projectIDs
 	 */
-	void setPreferences(Student student, Collection<Project> projects);
+	void setPreferences(String studentID, Collection<String> projectIDs);
 	
 	/**
 	 * sets the blacklist of a student
-	 * @param student
-	 * @param students
+	 * @param studentID
+	 * @param blacklistID
 	 */
-	void setBlacklist(Student student, Collection<Student> students);
+	void addToBlacklist(String studentID, String blacklistID);
 
 	/**
 	 * sets the roles of a student
-	 * @param student
+	 * @param studentID
 	 * @param roles
 	 */
-	void setRoles(Student student, Collection<RoleRequirement> roles);
+	void setRoles(String studentID, Collection<RoleRequirement> roles);
 	
 	
 }

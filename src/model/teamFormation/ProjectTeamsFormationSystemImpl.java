@@ -541,24 +541,27 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 
 	@Override
 	public void addProject(String desc, Collection<RoleRequirement> roles) {
-		connection.saveProject(new ProjectImpl("1", desc, roles));
-	}
-
-	@Override
-	public void setPreferences(Student student, Collection<Project> projects) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setBlacklist(Student student, Collection<Student> students) {
+	public void setPreferences(String studentID, Collection<String> projectIDs) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setRoles(Student student, Collection<RoleRequirement> roles) {
+	public void addToBlacklist(String studentID, String blacklistID) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void setRoles(String studentID, Collection<RoleRequirement> roles) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }
