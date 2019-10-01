@@ -3,24 +3,21 @@ package model.teamFormation;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import interfaces.Constraint;
-import interfaces.Project;
-import interfaces.SQLConnection;
-import interfaces.Student;
-import interfaces.Validator;
+import interfaces.*;
+import model.ConstraintRepositoryImpl;
 import model.constraints.SoftConstraint;
 
 public class ValidatorImpl implements Validator {
-	private SQLConnection connection;
+	private ConstraintRepository repo;
 
 	public ValidatorImpl(SQLConnection connection) {
-		this.connection = connection;
+		this.repo = new ConstraintRepositoryImpl(connection);
 	}
 
 	@Override
 	public int calculateFit(Project project) {
 		int result = 0;
-		for (SoftConstraint c : connection.getAllSoftConstraints()) {
+		for (SoftConstraint c : repo.getSoftConstraints()) {
 			if (c.validate(project)) {
 				result += 1 * c.getWeight();
 			}
@@ -32,10 +29,10 @@ public class ValidatorImpl implements Validator {
 	public Collection<String> getAllConstraintDesc() {
 		ArrayList<String> descs = new ArrayList<String>();
 
-		connection.getAllHardConstraints().forEach(c -> {
+		repo.getHardConstraints().forEach(c -> {
 			descs.add(c.getDescription());
 		});
-		connection.getAllSoftConstraints().forEach(c -> {
+		repo.getSoftConstraints().forEach(c -> {
 			descs.add(c.getDescription());
 		});
 
@@ -45,8 +42,8 @@ public class ValidatorImpl implements Validator {
 	@Override
 	public Constraint getConstraint(String desc) {
 		
-		ArrayList<Constraint> hardConstraints = (ArrayList<Constraint>) connection.getAllHardConstraints();
-		ArrayList<SoftConstraint> softConstraints = (ArrayList<SoftConstraint>) connection.getAllSoftConstraints();
+		ArrayList<Constraint> hardConstraints = (ArrayList<Constraint>) repo.getHardConstraints();
+		ArrayList<SoftConstraint> softConstraints = (ArrayList<SoftConstraint>) repo.getSoftConstraints();
 		
 		for(Constraint c : hardConstraints) {
 			if(c.getDescription().equalsIgnoreCase(desc)) {
@@ -65,7 +62,7 @@ public class ValidatorImpl implements Validator {
 
 	@Override
 	public boolean validateHardConstraints(Project project, Student student) {
-		for (Constraint constraint : connection.getAllHardConstraints()) {
+		for (Constraint constraint : repo.getHardConstraints()) {
 			if (!(constraint.validateAdd(project, student))) {
 				return false;
 			}
@@ -75,7 +72,7 @@ public class ValidatorImpl implements Validator {
 	
 	@Override
 	public boolean validateHardConstraints(Project project) {		
-		for (Constraint constraint : connection.getAllHardConstraints()) {
+		for (Constraint constraint : repo.getHardConstraints()) {
 			if (!constraint.validate(project)) {
 				return false;
 			}

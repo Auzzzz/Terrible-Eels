@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import interfaces.Constraint;
 import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
@@ -89,12 +88,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 		
 		return projects;
-	}
-
-	@Override
-	public Collection<Constraint> getAllHardConstraints() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

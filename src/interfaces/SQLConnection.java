@@ -22,12 +22,6 @@ public interface SQLConnection {
 	Collection<Project> getAllProjects();
 	
 	/**
-	 * Gets all of the hard constraints stored in the database
-	 * @return - a collection of constraints
-	 */
-	Collection<Constraint> getAllHardConstraints();
-	
-	/**
 	 * Gets all of the soft constraints stored in the database
 	 * @return - a collection of soft constraints
 	 */
