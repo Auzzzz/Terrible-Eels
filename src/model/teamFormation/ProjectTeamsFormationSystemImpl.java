@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import interfaces.*;
-import model.ProjectImpl;
 import model.RoleRequirement;
 
 
@@ -44,7 +43,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	@Override
-	public boolean swap(Student s1, Student s2, int acceptableChange) {
+	public boolean swap(String s1, String s2, int acceptableChange) {
 		return engine.swap(s1, s2, acceptableChange);
 	}
 

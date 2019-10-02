@@ -19,12 +19,12 @@ public interface TeamFormationEngine {
 	/**
 	 * swaps members between teams as long as the overall fitness value for swapped teams 
 	 * does not change by more than the specified value
-	 * @param s1 
-	 * @param s2
+	 * @param s1 - student number
+	 * @param s2 - student number
 	 * @param acceptableChange
 	 * @return - true if swap succeeded
 	 */
-	boolean swap(Student s1, Student s2, int acceptableChange);
+	boolean swap(String sNo1, String sNo2, int acceptableChange);
 	
 	
 	/**
