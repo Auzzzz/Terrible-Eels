@@ -64,6 +64,6 @@ public class AverageGPAConstraint extends AbstractConstraint {
 	public boolean validate(Project project) {
 		double averageGPA = calculateAverageGPA(project.getStudents());
 		
-		return (averageGPA >= this.averageGPA) ? false : true;
+		return (averageGPA >= this.averageGPA);
 	}
 }

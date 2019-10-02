@@ -8,10 +8,11 @@ import model.teamFormation.InsufficientStudentsException;
 import model.teamFormation.RemainedStudentsException;
 
 public interface ProjectTeamsFormationSystem {
+	/**
+	 * get description of all projects
+	 * @return
+	 */
 	Collection<String> getAllProjectDescs();
-	
-
-	
 	
 	/**
 	 * gets the most popular projects
@@ -31,13 +32,18 @@ public interface ProjectTeamsFormationSystem {
 	
 	/**
 	 * assign all students into projects
-	 * @return - true if all students are successfully assigned to projects
+	 * @return - all formed projects
 	 * @throws InsufficientStudentsException 
 	 * @throws InsufficientProjectsException 
 	 * @throws RemainedStudentsException 
 	 */
-	boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+	Collection<Project> assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
+	/**
+	 * save all formed projects 
+	 */
+	void confirmTeams();
+	
 	/**
 	 * adds a project to the database
 	 * @param desc
@@ -64,7 +70,5 @@ public interface ProjectTeamsFormationSystem {
 	 * @param studentID
 	 * @param roles
 	 */
-	void setRoles(String studentID, Collection<RoleRequirement> roles);
-	
-	
+	void setRoles(String studentID, Collection<RoleRequirement> roles);	
 }

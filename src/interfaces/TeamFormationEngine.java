@@ -26,14 +26,17 @@ public interface TeamFormationEngine {
 	 */
 	boolean swap(String sNo1, String sNo2, int acceptableChange);
 	
-	
 	/**
 	 * assign all students into projects
-	 * @return - true if all students are successfully assigned to projects
+	 * @return - all formed projects
 	 * @throws InsufficientStudentsException 
 	 * @throws InsufficientProjectsException 
 	 * @throws RemainedStudentsException 
 	 */
-	boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+	Collection<Project> assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
+	/**
+	 * save all formed projects 
+	 */
+	void confirmTeams();
 }

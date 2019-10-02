@@ -6,7 +6,6 @@ import java.util.Collection;
 import interfaces.*;
 import model.RoleRequirement;
 
-
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
 	private SQLConnection connection;
 	private TeamFormationEngine engine;
@@ -48,9 +47,14 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	@Override
-	public boolean assignStudents()
+	public Collection<Project> assignStudents()
 			throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
 		return engine.assignStudents();
+	}
+	
+	@Override
+	public void confirmTeams() {
+		engine.confirmTeams();
 	}
 
 	@Override
