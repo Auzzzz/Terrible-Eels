@@ -19,21 +19,24 @@ public interface TeamFormationEngine {
 	/**
 	 * swaps members between teams as long as the overall fitness value for swapped teams 
 	 * does not change by more than the specified value
-	 * @param s1 
-	 * @param s2
+	 * @param s1 - student number
+	 * @param s2 - student number
 	 * @param acceptableChange
 	 * @return - true if swap succeeded
 	 */
-	boolean swap(Student s1, Student s2, int acceptableChange);
-	
+	boolean swap(String sNo1, String sNo2, int acceptableChange);
 	
 	/**
 	 * assign all students into projects
-	 * @return - true if all students are successfully assigned to projects
+	 * @return - all formed projects
 	 * @throws InsufficientStudentsException 
 	 * @throws InsufficientProjectsException 
 	 * @throws RemainedStudentsException 
 	 */
-	boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+	Collection<Project> assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
+	/**
+	 * save all formed projects 
+	 */
+	void confirmTeams();
 }

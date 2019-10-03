@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import interfaces.*;
-import model.ProjectImpl;
 import model.RoleRequirement;
-
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
 	private SQLConnection connection;
@@ -44,14 +42,19 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	@Override
-	public boolean swap(Student s1, Student s2, int acceptableChange) {
+	public boolean swap(String s1, String s2, int acceptableChange) {
 		return engine.swap(s1, s2, acceptableChange);
 	}
 
 	@Override
-	public boolean assignStudents()
+	public Collection<Project> assignStudents()
 			throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
 		return engine.assignStudents();
+	}
+	
+	@Override
+	public void confirmTeams() {
+		engine.confirmTeams();
 	}
 
 	@Override

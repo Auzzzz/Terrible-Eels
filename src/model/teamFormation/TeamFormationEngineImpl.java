@@ -20,6 +20,7 @@ import model.constraints.SoftConstraint;
 public class TeamFormationEngineImpl implements TeamFormationEngine {
 	private SQLConnection connection;
 	private Validator validator;
+	private TeamFormationState state = null;
 	
 	public TeamFormationEngineImpl(SQLConnection connection) {
 		this.connection = connection;
@@ -41,9 +42,11 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	}
 	
 	@Override
-	public boolean swap(Student s1, Student s2, int acceptableChange) {
-		Project project1 = connection.getProject(s1);
-		Project project2 = connection.getProject(s2);
+	public boolean swap(String sNo1, String sNo2, int acceptableChange) {
+		Student s1 = connection.getStudent(sNo1);
+		Student s2 = connection.getStudent(sNo2);
+		Project project1 = connection.getProject(sNo1);
+		Project project2 = connection.getProject(sNo2);
 		
 		if (!((project1.getId()).equals(project2.getId()))) {
 			// create temporary teams
@@ -313,7 +316,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 */
 	private void assign(TeamFormationState state, Project project, Student student) {
 		project.addStudent(student);
-		connection.saveProject(project);
 		state.removeStudent(student);
 		state.updateProject(project);
 	}
@@ -489,7 +491,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	}
 	
 	@Override
-	public boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
+	public Collection<Project> assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
 		Collection<Project> candidateProjects = getPopularProjects();
 		List<Student> female = new LinkedList<>(connection.getFemaleStudents());
 		List<Student> other = new LinkedList<>(connection.getMaleStudents());
@@ -500,7 +502,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		Collections.shuffle(other, new Random(System.currentTimeMillis()));
 		
 		// assign female students and then others
-		TeamFormationState state = new TeamFormationState(female, candidateProjects);
+		state = new TeamFormationState(female, candidateProjects);
 		assignStudents(state);
 		state.addStudents(other);
 		assignStudents(state);
@@ -511,9 +513,17 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		// student(s) will remain if the number of all students is not divisible by team capacity
 		Collection<Student> remainders = state.getRemainingStudents();
 		if (remainders.size() > 0) {
-			throw new RemainedStudentsException(remainders);
+			throw new RemainedStudentsException(remainders, state.getFormedProjects());
 		}
 		
-		return (remainders.size() == 0);
+		return state.getFormedProjects();
+	}
+	
+	@Override
+	public void confirmTeams() {
+		if (state != null) {
+			Collection<Project> formedProjects = state.getFormedProjects();
+			formedProjects.forEach(connection::saveProject);
+		}
 	}
 }

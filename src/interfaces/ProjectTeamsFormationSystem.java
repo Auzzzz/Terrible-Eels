@@ -8,16 +8,11 @@ import model.teamFormation.InsufficientStudentsException;
 import model.teamFormation.RemainedStudentsException;
 
 public interface ProjectTeamsFormationSystem {
-	Collection<String> getAllProjectDescs();
-	
-
 	/**
-	 * get popular projects as a list of Projects
-	 * the number of popular projects equals to the number of teams to be formed
-	 * @return - list of Projects
-	 * @throws InsufficientStudentsException 
+	 * get description of all projects
+	 * @return
 	 */
-	Collection<Project> getPopularProjects() throws InsufficientStudentsException;
+	Collection<String> getAllProjectDescs();
 	
 	/**
 	 * gets the most popular projects
@@ -28,22 +23,27 @@ public interface ProjectTeamsFormationSystem {
 	/**
 	 * swaps members between teams as long as the overall fitness value for swapped teams 
 	 * does not change by more than the specified value
-	 * @param s1 
-	 * @param s2
+	 * @param s1 - student number
+	 * @param s2 - student number
 	 * @param acceptableChange
 	 * @return - true if swap succeeded
 	 */
-	boolean swap(Student s1, Student s2, int acceptableChange);
+	boolean swap(String s1, String s2, int acceptableChange);
 	
 	/**
 	 * assign all students into projects
-	 * @return - true if all students are successfully assigned to projects
+	 * @return - all formed projects
 	 * @throws InsufficientStudentsException 
 	 * @throws InsufficientProjectsException 
 	 * @throws RemainedStudentsException 
 	 */
-	boolean assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+	Collection<Project> assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
+	/**
+	 * save all formed projects 
+	 */
+	void confirmTeams();
+	
 	/**
 	 * adds a project to the database
 	 * @param desc
@@ -70,7 +70,5 @@ public interface ProjectTeamsFormationSystem {
 	 * @param studentID
 	 * @param roles
 	 */
-	void setRoles(String studentID, Collection<RoleRequirement> roles);
-	
-	
+	void setRoles(String studentID, Collection<RoleRequirement> roles);	
 }
