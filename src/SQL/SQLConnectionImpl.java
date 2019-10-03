@@ -1,4 +1,5 @@
 package SQL;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,8 +13,8 @@ import model.constraints.SoftConstraint;
 
 public class SQLConnectionImpl implements SQLConnection {
 	private static Connection conn = null;
-	
-	public SQLConnectionImpl()  {
+
+	public SQLConnectionImpl() {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection("jdbc:sqlite:db/SEF.db");
@@ -42,51 +43,79 @@ public class SQLConnectionImpl implements SQLConnection {
 	@Override
 	public int getStudentCount() {
 		String query = "SELECT COUNT(StuID) FROM Student;";
-		
+
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
-	    	
-	    	if (rs.next()) {
-	    		return rs.getInt(1);
+
+			if (rs.next()) {
+				return rs.getInt(1);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return 0;
 	}
 
 	@Override
 	public int getProjectCount() {
-		// TODO Auto-generated method stub
+		String query = "SELECT COUNT(ProID) FROM Project;";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		return 0;
 	}
 
+//TODO: fix getallstudents
 	@Override
 	public Collection<Student> getAllStudents() {
-		// TODO Auto-generated method stub
-		return null;
+		list<Student> students = new ArrayList<>();
+		String qurey = "SELECT StuID from Student ORDER BY StuID ASC";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				// Student student = new
+				Student.add(student);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return students;
 	}
 
 	@Override
 	public Collection<Project> getAllProjects() {
 		List<Project> projects = new ArrayList<>();
 		String query = "SELECT * FROM Project;";
-		
+
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
-	    	
-	    	while (rs.next()) {
-	    		Project project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
-	    		projects.add(project);
-	    		
+
+			while (rs.next()) {
+				Project project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
+				projects.add(project);
+
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return projects;
 	}
 
@@ -98,81 +127,95 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public Collection<Student> getFemaleStudents() {
-		// TODO Auto-generated method stub
-		return null;
+		//List<Student> student = new Arraylist<>();
+		//String qurey = "SELECT StuID from Student WHERE Gender = 'F';";
+		
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+			
+			while{
+				
+			}
+		}
+		
 	}
 
 	@Override
 	public Collection<Student> getMaleStudents() {
 		// TODO Auto-generated method stub
+		//SELECT StuID from Student WHERE Gender = 'M';
+		
 		return null;
 	}
-	
+
 	@Override
 	public Collection<Student> getOtherStudents() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	
 	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
 		List<String> projectIds = new ArrayList<>();
-		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT " + idealNumberOfProject + ";";
-		
+		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT "
+				+ idealNumberOfProject + ";";
+
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
-	    	
-	    	while(rs.next()) {
-	    		projectIds.add(rs.getString(1));
-			}	
+
+			while (rs.next()) {
+				projectIds.add(rs.getString(1));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-    	
+
 		return projectIds;
 	}
-	
+
 	// TODO - fix project instantiation - more data required
 	@Override
 	public Collection<Project> getPopularProjects(int idealNumberOfProjects) {
 		Collection<Project> projects = new ArrayList<>();
 		Collection<String> projectIds = getPopularProjectIds(idealNumberOfProjects);
-		
+
 		for (String projectId : projectIds) {
 			Project project = null;
 			String query = "SELECT * FROM Project WHERE ProID = " + projectId + ";";
-			
+
 			try {
 				Statement state = conn.createStatement();
 				ResultSet rs = state.executeQuery(query);
-		    	
-		    	if (rs.next()) {
-		    		// TODO: use another project constructor
-		    		project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
+
+				if (rs.next()) {
+					// TODO: use another project constructor
+					project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			if (project != null) {
 				projects.add(project);
 			}
 		}
-		
+
 		return projects;
 	}
 
 	@Override
 	public Project getProject(Student student) {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public void saveProject(Project project) {
 		// TODO Auto-generated method stub
-		
+		// INSERT INTO Project Values ( NULL , 'Test DESC', 'Req', NULL)
+		// Can leave first Null, DESC, Requirments, Null if Client not known)
 	}
 
 	@Override
@@ -184,6 +227,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	@Override
 	public void updateProject(Project project1) {
 		// TODO Auto-generated method stub
-		
+		//UPDATE Project Set Desc = 'THis is a update' WHERE ProID = '2'
+
 	}
 }

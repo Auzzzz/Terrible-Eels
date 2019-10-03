@@ -1,209 +1,99 @@
 package view;
-//-----------------------\\
 
-//    DONT USE ME!!!     \\
-//-----------------------\\
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.awt.EventQueue;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JScrollPane;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.JTextField;
 
-import java.util.Scanner;
-import SQL.SQLConnectionImpl;
-import interfaces.ProjectTeamsFormationSystem;
-import interfaces.SQLConnection;
-import model.teamFormation.ProjectTeamsFormationSystemImpl;
+public class GUIMenu {
 
-
-public class GUIMenu extends JFrame {
-
-	public void run() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 409, 243);
-		setTitle("ThaiCreate.Com Java GUI Tutorial");
-		getContentPane().setLayout(null);
-
-		// Model
-		DefaultListModel model = new DefaultListModel();
-
-		Connection connect = ConnectDB();
-		Statement s = null;
-
-		try {
-
-			s = connect.createStatement();
-
-			String sql = "SELECT * FROM  student";
-
-			ResultSet rec = s.executeQuery(sql);
-			int row = 0;
-			while ((rec != null) && (rec.next())) {
-				model.addElement(rec.getString("StuID") + " - " + rec.getString("Gender"));
-			}
-
-			rec.close();
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
-		}
-
-		try {
-			if (s != null) {
-				s.close();
-				connect.close();
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// Label Result
-		final JLabel lblResult = new JLabel("Result");
-		lblResult.setHorizontalAlignment(SwingConstants.CENTER);
-		lblResult.setBounds(62, 154, 272, 14);
-		getContentPane().add(lblResult);
-
-		// Scroll Pane
-		JScrollPane scrollPane = new JScrollPane();
-
-		final JList list = new JList(model);
-		list.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent evt) {
-				lblResult.setText(list.getSelectedValue().toString());
-			}
-		});
-
-		scrollPane.setViewportView(list);
-		scrollPane.setBounds(113, 48, 167, 67);
-		getContentPane().add(scrollPane);
-
-	}
-
-	// Connection
-	private Connection ConnectDB() {
-		try {
-			Class.forName("org.sqlite.JDBC");
-			return DriverManager.getConnection("jdbc:sqlite:db/SEF.db");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+	public static class GUI_Menu {
+		@SuppressWarnings("null")
+		public GUI_Menu(){
+			JFrame frame = new JFrame("Group Managment System - Students");
+			JButton button,button1, button2, button3,button4;
+			button = new JButton("Add Student");
+			button1 = new JButton("Add Student to Group");
+			button2 = new JButton("button 3");
+			button3 = new JButton("button 4");
+			button4 = new JButton("button 5");
+			frame.add(button);
+			frame.add(button1);
+			frame.add(button2);
+			frame.add(button3);
+			frame.add(button4);
+			frame.setLayout(new FlowLayout());
+			frame.setSize(300,300);  
+			frame.setVisible(true);  
 	
+			//add Student
+			button.addActionListener(new ActionListener()
+			    {
+			      public void actionPerformed(ActionEvent e)
+			      {
+			    	  JFrame f=new JFrame("Add Student"); 
+						//submit button
+			JButton stuaddsubmit=new JButton("Submit");    
+			stuaddsubmit.setBounds(100,130,140, 40);    
+						//enter name label
+			JLabel label = new JLabel();		
+			label.setText("Enter Name :");
+			label.setBounds(10, 10, 100, 100);
+						//empty label which will show event after button clicked
+			JLabel label1 = new JLabel();
+			label1.setBounds(10, 110, 200, 100);
+						//textfield to enter name
+			JTextField textfieldname= new JTextField();
+			textfieldname.setBounds(110, 50, 130, 30);
+			//textfield to enter name
+			JTextField textfieldgend= new JTextField();
+			textfieldgend.setBounds(110, 90, 130, 30);
+						//add to frame
+			f.add(label1);
+			f.add(textfieldname);
+			f.add(label);
+			f.add(textfieldgend);
+			f.add(stuaddsubmit);    
+			f.setSize(300,300);    
+			f.setLayout(null);    
+			f.setVisible(true);    
+			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
+			
+								//action listener
+			stuaddsubmit.addActionListener(new ActionListener() {
+		        
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+						label1.setText("Name has been submitted.");				
+				}          
+		      });
+			}
+			      }
+
+		);
+			
+			//add student to group
+			button1.addActionListener(new ActionListener()
+		    {
+
+		public void actionPerformed(ActionEvent e) {
+			// display/center the jdialog when the button is pressed
+			JDialog d = new JDialog(frame, "Hello", true);
+			d.setLocationRelativeTo(frame);
+			d.setVisible(true);
+		}
+
+	});
+
 }
 
-//public class MyForm extends JFrame {
-//
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				run frame = new run();
-//				frame.setVisible(true);
-//			}
-//		});
-//	}
-//
-//	/**
-//	 * Create the frame.
-//	 */
-//	public MyForm() {
-//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		setBounds(100, 100, 409, 243);
-//		setTitle("ThaiCreate.Com Java GUI Tutorial");
-//		getContentPane().setLayout(null);
-//
-//		// Model
-//		DefaultListModel model = new DefaultListModel();
-//
-//		Connection connect = ConnectDB();
-//		Statement s = null;
-//
-//		try {
-//
-//			s = connect.createStatement();
-//
-//			String sql = "SELECT * FROM  customer ORDER BY CustomerID ASC";
-//
-//			ResultSet rec = s.executeQuery(sql);
-//			int row = 0;
-//			while ((rec != null) && (rec.next())) {
-//				model.addElement(rec.getString("CustomerID") + " - " + rec.getString("Name"));
-//			}
-//
-//			rec.close();
-//
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			JOptionPane.showMessageDialog(null, e.getMessage());
-//			e.printStackTrace();
-//		}
-//
-//		try {
-//			if (s != null) {
-//				s.close();
-//				connect.close();
-//			}
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		// Label Result
-//		final JLabel lblResult = new JLabel("Result");
-//		lblResult.setHorizontalAlignment(SwingConstants.CENTER);
-//		lblResult.setBounds(62, 154, 272, 14);
-//		getContentPane().add(lblResult);
-//
-//		// Scroll Pane
-//		JScrollPane scrollPane = new JScrollPane();
-//
-//		final JList list = new JList(model);
-//		list.addMouseListener(new MouseAdapter() {
-//			public void mouseClicked(MouseEvent evt) {
-//				lblResult.setText(list.getSelectedValue().toString());
-//			}
-//		});
-//
-//		scrollPane.setViewportView(list);
-//		scrollPane.setBounds(113, 48, 167, 67);
-//		getContentPane().add(scrollPane);
-//
-//	}
-//
-//	// Connection
-//	private Connection ConnectDB() {
-//		try {
-//			Class.forName("com.mysql.jdbc.Driver");
-//			return DriverManager.getConnection("jdbc:mysql://localhost/mydatabase" + "?user=root&password=root");
-//		} catch (ClassNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
-//
-//}
+}
+
+}
