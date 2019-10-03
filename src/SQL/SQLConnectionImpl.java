@@ -69,6 +69,7 @@ public class SQLConnectionImpl implements SQLConnection {
 		return null;
 	}
 
+	
 	@Override
 	public Collection<Project> getAllProjects() {
 		List<Project> projects = new ArrayList<>();
