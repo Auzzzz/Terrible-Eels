@@ -79,8 +79,8 @@ public class SQLConnectionImpl implements SQLConnection {
 //TODO: fix getallstudents
 	@Override
 	public Collection<Student> getAllStudents() {
-		list<Student> students = new ArrayList<>();
-		String qurey = "SELECT StuID from Student ORDER BY StuID ASC";
+		List<Student> students = new ArrayList<Student>();
+		String query = "SELECT StuID from Student ORDER BY StuID ASC";
 
 		try {
 			Statement state = conn.createStatement();
@@ -88,7 +88,7 @@ public class SQLConnectionImpl implements SQLConnection {
 
 			while (rs.next()) {
 				// Student student = new
-				Student.add(student);
+				// Student.add(student);
 			}
 
 		} catch (SQLException e) {
@@ -98,7 +98,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		return students;
 	}
 
-	
 	@Override
 	public Collection<Project> getAllProjects() {
 		List<Project> projects = new ArrayList<>();
@@ -128,25 +127,28 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public Collection<Student> getFemaleStudents() {
-		//List<Student> student = new Arraylist<>();
-		//String qurey = "SELECT StuID from Student WHERE Gender = 'F';";
+		List<Student> student = new ArrayList<Student>();
+		String query = "SELECT StuID from Student WHERE Gender = 'F';";
+
 		
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
 			
-			while{
-				
-			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		
+		return student;
+
 	}
 
 	@Override
 	public Collection<Student> getMaleStudents() {
 		// TODO Auto-generated method stub
-		//SELECT StuID from Student WHERE Gender = 'M';
-		
+		// SELECT StuID from Student WHERE Gender = 'M';
+
 		return null;
 	}
 
@@ -206,13 +208,6 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public Project getProject(Student student) {
-		// TODO Auto-generated method stub
-		
-		return null;
-	}
-
-	@Override
 	public void saveProject(Project project) {
 		// TODO Auto-generated method stub
 		// INSERT INTO Project Values ( NULL , 'Test DESC', 'Req', NULL)
@@ -222,13 +217,25 @@ public class SQLConnectionImpl implements SQLConnection {
 	@Override
 	public void saveConstraint(String desc, int weight) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void updateProject(Project project1) {
 		// TODO Auto-generated method stub
-		//UPDATE Project Set Desc = 'THis is a update' WHERE ProID = '2'
+		// UPDATE Project Set Desc = 'THis is a update' WHERE ProID = '2'
 
+	}
+
+	@Override
+	public Project getProject(String studentNo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Student getStudent(String studentNo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -132,9 +132,7 @@ public class Menu {
 			System.out.println("*******************************************");
 			System.out.println("Press 1 to Display All Projects ");
 			System.out.println("Press 2 to Display Popular Projects ");
-			System.out.println("Press 3 to review unpopular");
-			System.out.println("Press 4 to delete all unpopular projects");
-			System.out.println("Press 5 to exit");
+			System.out.println("Press 3 to exit");
 			System.out.println("*******************************************");
 
 			input = scanner.nextLine();
@@ -150,13 +148,6 @@ public class Menu {
 				break;
 
 			case "3":
-				// System.out.println(system.getUnPopularProjects());
-				System.out.println("Display All Unpopular projects");
-				break;
-			case "4":
-				System.out.println("Delete all unpopular projects");
-				break;
-			case "5":
 				user = "exit";
 				break;
 			default:
