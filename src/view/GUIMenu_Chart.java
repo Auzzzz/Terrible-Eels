@@ -56,8 +56,7 @@ public class GUIMenu_Chart extends ApplicationFrame {
    }
    
    public static void main( String[ ] args ) {
-      GUIMenu_Chart chart = new GUIMenu_Chart("Car Usage Statistics", 
-         "Which car do you like?");
+      GUIMenu_Chart chart = new GUIMenu_Chart("Car Usage Statistics", "Which car do you like?");
       chart.pack( );        
       RefineryUtilities.centerFrameOnScreen( chart );        
       chart.setVisible( true ); 

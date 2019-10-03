@@ -1,20 +1,27 @@
 package driver;
 
-import view.Menu;
 import java.awt.EventQueue;
+
+import javax.swing.SwingUtilities;
+
+import view.GUIMenu;
+import view.GUIMenu.GUI_Menu;
+import view.GUIMenu_Login;
+import view.Menu;
 
 public class Driver {
 
 	public static void main(String[] args) {
 		
-		Menu menu = new Menu();
-		menu.run();
+		//Menu menu = new Menu();
+		//menu.run();
 		
 	    //-----------------------\\
        //	    DONT USE ME!!!    \\
       //---------------------------\\
-		//GUIMenu gui = new GUIMenu();
-		//gui.run();
+
+		//new GUI_Menu();
+		new GUIMenu_Login();
 
 	}
 
