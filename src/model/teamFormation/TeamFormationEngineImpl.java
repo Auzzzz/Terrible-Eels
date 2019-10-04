@@ -41,41 +41,59 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		return connection.getPopularProjects(idealNumberOfProjects);
 	}
 	
+	/**
+	 * create a temporary team in which one member is swapped out and another member swapped in
+	 * @param swapOut - student to be swapped out
+	 * @param swapIn - student to be swapped in
+	 * @return - temporary team
+	 */
+	private Project createTemporaryTeam(Student swapOut, Student swapIn) {
+		Project temp = new ProjectImpl(null, null, null);
+		Project project = connection.getProject(swapOut.getStudentNo());
+		Collection<Student> tempMembers = project.getStudents();
+		tempMembers.remove(swapOut);
+		tempMembers.add(swapIn);
+		tempMembers.forEach(temp::addStudent);
+		
+		return temp;
+	}
+	
+	/**
+	 * get the difference between two projects' fitness values
+	 * @param p1 - project 1
+	 * @param p2 - project 2
+	 * @return - difference
+	 */
+	private int getFitDifference(Project p1, Project p2) {
+		int p1Fit = validator.calculateFit(p1);
+		int p2Fit = validator.calculateFit(p2);
+		
+		return Math.abs(p1Fit - p2Fit);
+	}
+	
 	@Override
 	public boolean swap(String sNo1, String sNo2, int acceptableChange) {
 		Student s1 = connection.getStudent(sNo1);
 		Student s2 = connection.getStudent(sNo2);
-		Project project1 = connection.getProject(sNo1);
-		Project project2 = connection.getProject(sNo2);
+		Project p1 = connection.getProject(sNo1);	// s1's original project	
+		Project p2 = connection.getProject(sNo2);	// s2's original project	
 		
-		if (!((project1.getId()).equals(project2.getId()))) {
-			// create temporary teams
-			Project temp1 = new ProjectImpl("s1", "A test project", new ArrayList<RoleRequirement>());
-			Project temp2 = new ProjectImpl("s2", "Another test project", new ArrayList<RoleRequirement>());
+		// if s1 and s2 are from different projects
+		if (!((p1.getId()).equals(p2.getId()))) {
+			// temporary projects after students are swapped
+			Project p1Temp = createTemporaryTeam(s1, s2);	// s1's team members + s2
+			Project p2Temp = createTemporaryTeam(s2, s1);	// s2's team members + s1
 			
-			temp1.addStudent(s2);
-			temp2.addStudent(s1);
-			
-			for (Student student : project1.getStudents()) {
-				if (!((student.getStudentNo()).equals(s1.getStudentNo()))) {
-					temp1.addStudent(student);
-				}
-			}
-			
-			for (Student student : project2.getStudents()) {
-				if (!((student.getStudentNo()).equals(s2.getStudentNo()))) {
-					temp2.addStudent(student);
-				}
-			}
-			
-			if ((validator.calculateFit(temp1) >= acceptableChange) && (validator.calculateFit(temp2) >= acceptableChange)) {
-				project1.removeStudent(s1);
-				project1.addStudent(s2);
-				project2.removeStudent(s2);
-				project2.addStudent(s1);
-				
-				connection.saveProject(project1);
-				connection.saveProject(project2);
+			// if the change is within acceptable value
+			int p1FitChange = getFitDifference(p1, p1Temp);
+			int p2FitChange = getFitDifference(p2, p2Temp);
+			if ((p1FitChange <= acceptableChange) && (p2FitChange <= acceptableChange)) {
+				p1.removeStudent(s1);
+				p1.addStudent(s2);
+				p2.removeStudent(s2);
+				p2.addStudent(s1);
+				connection.saveProject(p1);
+				connection.saveProject(p2);
 				
 				return true;
 			}
