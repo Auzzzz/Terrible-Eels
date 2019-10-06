@@ -31,13 +31,13 @@ public interface ProjectTeamsFormationSystem {
 	boolean swap(String s1, String s2, int acceptableChange);
 	
 	/**
-	 * assign all students into projects
+	 * form teams by assigning students into projects
 	 * @return - all formed projects
 	 * @throws InsufficientStudentsException 
 	 * @throws InsufficientProjectsException 
 	 * @throws RemainedStudentsException 
 	 */
-	Collection<Project> assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+	Collection<Project> formTeams() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
 	/**
 	 * save all formed projects 

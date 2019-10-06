@@ -31,8 +31,7 @@ public class StudentScore implements Comparable<StudentScore> {
 		if (this.score < o.getScore()) {
 			return -1;
 		}
-		
-		if (this.score >= o.getScore()) {
+		if (this.score > o.getScore()) {
 			return 1;
 		}
 		

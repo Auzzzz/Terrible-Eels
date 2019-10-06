@@ -47,9 +47,9 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	@Override
-	public Collection<Project> assignStudents()
+	public Collection<Project> formTeams()
 			throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
-		return engine.assignStudents();
+		return engine.formTeams();
 	}
 	
 	@Override
