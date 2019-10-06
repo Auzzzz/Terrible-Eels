@@ -111,7 +111,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param student
 	 * @return - a RoleRequirement with matching Role
 	 */
-	private RoleRequirement getRoleMatch(TeamFormationState state, Project project, Student student) {
+	private RoleRequirement getRoleMatch(Project project, Student student) {
 		Collection<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
 		Collection<RoleRequirement> sRoleReqs = student.getRolePreferences();
 				
@@ -137,7 +137,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param student
 	 * @return - a RoleRequirement with matching Skill
 	 */
-	private RoleRequirement getSkillMatch(TeamFormationState state, Project project, Student student) {
+	private RoleRequirement getSkillMatch(Project project, Student student) {
 		Collection<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
 		Collection<RoleRequirement> sRoleReqs = student.getRolePreferences();
 		
@@ -171,7 +171,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param student
 	 * @return - a RoleRequirement with matching Skill
 	 */
-	private RoleRequirement getRoleAndSkillMatch(TeamFormationState state, Project project, Student student) {
+	private RoleRequirement getRoleAndSkillMatch(Project project, Student student) {
 		Collection<RoleRequirement> pRoleReqs = state.getRoleRequirements(project);
 		Collection<RoleRequirement> sRoleReqs = student.getRolePreferences();
 				
@@ -253,20 +253,20 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param student
 	 * @return - fitness score of the student for the project
 	 */
-	private int calcRoleRequirementScore(Project project, Student student, TeamFormationState state) {
+	private int calcRoleRequirementScore(Project project, Student student) {
 		// fitness values
 		final int ROLE_SKILL_MATCH = 10;
 		final int SKILL_MATCH = 9;
 		final int ROLE_MATCH = 8;
 		int score = 0;
 		
-		if (getRoleAndSkillMatch(state, project, student) != null) {
+		if (getRoleAndSkillMatch(project, student) != null) {
 			score += ROLE_SKILL_MATCH;
 		}
-		else if (getSkillMatch(state, project, student) != null) {
+		else if (getSkillMatch(project, student) != null) {
 			score += SKILL_MATCH;
 		}
-		else if (getRoleMatch(state, project, student) != null) {
+		else if (getRoleMatch(project, student) != null) {
 			score += ROLE_MATCH;
 		}
 		
@@ -282,12 +282,17 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @return - fitness score of the student for the project
 	 */
 	private int calcSoftConstraintScore(Project project, Student student) {
+		final int MAX_SCORE = 10;
 		int score = 0;
+		List<SoftConstraint> constraints = new ArrayList<>(connection.getAllSoftConstraints());
+		Collections.sort(constraints);	// sorted by weight
+		int maxWeight = constraints.get(0).getWeight();
 		
-		for (SoftConstraint constraint : connection.getAllSoftConstraints()) {
-			// if addition of the student to the project satisfies soft constraint
+		for (SoftConstraint constraint : constraints) {
+			// if the constraint is satisfied
 			if (constraint.validateAdd(project, student)) {
-				score += constraint.getWeight();
+				int weight = constraint.getWeight();
+				score += (int)((weight / maxWeight) * MAX_SCORE);
 			}
 		}
 		
@@ -302,7 +307,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param state
 	 * @return - the result of all calculations, as a list of ProjectScoresData
 	 */
-	private Collection<ProjectScoresData> calcScores(TeamFormationState state) {
+	private Collection<ProjectScoresData> calcScores() {
 		List<ProjectScoresData> scoresDataList = new ArrayList<>();
 		Collection<Project> remainingProjects = state.getRemainingProjects();
 		Collection<Student> remainingStudents = state.getRemainingStudents();
@@ -313,7 +318,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 			
 			for (Student student : remainingStudents) {
 				int projectPrefScore = calcProjectPreferenceScore(project, student);
-				int roleReqScore = calcRoleRequirementScore(project, student, state);
+				int roleReqScore = calcRoleRequirementScore(project, student);
 				int softConstScore = calcSoftConstraintScore(project, student);
 				
 				StudentScore studentScore = new StudentScore(student, projectPrefScore + roleReqScore + softConstScore);
@@ -332,7 +337,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param project
 	 * @param student
 	 */
-	private void assign(TeamFormationState state, Project project, Student student) {
+	private void assign(Project project, Student student) {
 		project.addStudent(student);
 		state.removeStudent(student);
 		state.updateProject(project);
@@ -357,12 +362,12 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param project
 	 * @param student
 	 */
-	private void assignForPhase1(TeamFormationState state, Project project, Student student) {
-		RoleRequirement roleMatch = getRoleMatch(state, project, student);
+	private void assignForPhase1(Project project, Student student) {
+		RoleRequirement roleMatch = getRoleMatch(project, student);
 		
 		if (roleMatch != null) {
 			if (validateAssignment(project, student)) {
-				assign(state, project, student);
+				assign(project, student);
 				state.removeRoleRequirement(project.getId(), roleMatch);
 			}
 		}
@@ -377,11 +382,11 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @param project
 	 * @param student
 	 */
-	private void assignForPhase2(TeamFormationState state, Project project, Student student) {
-		RoleRequirement roleMatch = getRoleMatch(state, project, student);
+	private void assignForPhase2(Project project, Student student) {
+		RoleRequirement roleMatch = getRoleMatch(project, student);
 		
 		if (validateAssignment(project, student)) {
-			assign(state, project, student);
+			assign(project, student);
 			
 			if (roleMatch != null) {
 				state.removeRoleRequirement(project.getId(), roleMatch);
@@ -401,7 +406,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @throws InsufficientProjectsException
 	 * @throws InsufficientStudentsException
 	 */
-	private void assignStudentsPhase1(TeamFormationState state) throws InsufficientProjectsException, InsufficientStudentsException {
+	private void assignStudentsPhase1() throws InsufficientProjectsException, InsufficientStudentsException {
 		Collection<Student> students = state.getRemainingStudents();
 		Collection<Project> projects = state.getRemainingProjects();
 		
@@ -416,7 +421,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		}
 		
 		// data of all student's score for each project
-		Collection<ProjectScoresData> scoresData = calcScores(state);
+		Collection<ProjectScoresData> scoresData = calcScores();
 		
 		// for each project, check all the students' scores for the project
 		for (ProjectScoresData scoresForProject : scoresData) {
@@ -435,7 +440,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 				Student student = score.getStudent();
 				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
-					assignForPhase1(state, project, student);
+					assignForPhase1(project, student);
 				}
 			}
 		}
@@ -451,9 +456,9 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @throws InsufficientProjectsException
 	 * @throws InsufficientStudentsException
 	 */
-	private void assignStudentsPhase2(TeamFormationState state) {
+	private void assignStudentsPhase2() {
 		// data of all student's score for each project
-		Collection<ProjectScoresData> scoresData = calcScores(state);
+		Collection<ProjectScoresData> scoresData = calcScores();
 		
 		// for each project, check all the students' scores for the project
 		for (ProjectScoresData scoresForProject : scoresData) {
@@ -472,7 +477,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 				Student student = score.getStudent();
 				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
 				if (remainingStudent != null) {
-					assignForPhase2(state, project, student);
+					assignForPhase2(project, student);
 				}
 			}
 		}
@@ -485,23 +490,23 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @throws InsufficientProjectsException
 	 * @throws InsufficientStudentsException
 	 */
-	private void assignStudents(TeamFormationState state) throws InsufficientProjectsException, InsufficientStudentsException {
-		assignStudentsPhase1(state);
-		assignStudentsPhase2(state);
+	private void assignStudents() throws InsufficientProjectsException, InsufficientStudentsException {
+		assignStudentsPhase1();
+		assignStudentsPhase2();
 	}
 
 	/**
 	 * assign remaining students to any vacant project regardless of hard constraints
 	 * @param state
 	 */
-	private void forceAssign(TeamFormationState state) {
+	private void forceAssign() {
 		List<Student> students = new ArrayList<>(state.getRemainingStudents());
 		List<Project> projects = new ArrayList<>(state.getRemainingProjects());
 		
 		for (Student student : students) {
 			for (Project project : projects) {
 				if ((project.getStudents().size() < Project.TEAM_CAPACITY)) {
-					assign(state, project, student);
+					assign(project, student);
 					break;
 				}
 			}
@@ -509,7 +514,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	}
 	
 	@Override
-	public Collection<Project> assignStudents() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
+	public Collection<Project> formTeams() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
 		Collection<Project> candidateProjects = getPopularProjects();
 		List<Student> female = new LinkedList<>(connection.getFemaleStudents());
 		List<Student> other = new LinkedList<>(connection.getMaleStudents());
@@ -521,12 +526,12 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		
 		// assign female students and then others
 		state = new TeamFormationState(female, candidateProjects);
-		assignStudents(state);
+		assignStudents();
 		state.addStudents(other);
-		assignStudents(state);
+		assignStudents();
 		
 		// assign remaining students to any vacant project
-		forceAssign(state);
+		forceAssign();
 		
 		// student(s) will remain if the number of all students is not divisible by team capacity
 		Collection<Student> remainders = state.getRemainingStudents();
