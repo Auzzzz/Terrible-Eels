@@ -75,6 +75,12 @@ public class StudentImpl implements Student {
 		return null;
 	}
 
+	@Override
+	public double getExperience() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	
 
 }
