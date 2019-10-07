@@ -33,6 +33,12 @@ public interface Student {
 	double getGpa();
 	
 	/**
+	 * gets the student's experience
+	 * @return
+	 */
+	double getExperience();
+	
+	/**
 	 * gets the student's gender
 	 * @return
 	 */

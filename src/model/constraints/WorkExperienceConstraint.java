@@ -18,8 +18,8 @@ public class WorkExperienceConstraint extends SoftConstraint {
 	
 	@Override
 	public boolean validateAdd(Project project, Student student) {
-		if (!validate(project)) {
-			return (student.getGpa() >= EXPERIENCE);
+		if (project.getStudents().size() > 2 && !validate(project)) {
+			return (student.getExperience() >= EXPERIENCE);
 		}
 		return true;
 	}
@@ -29,7 +29,7 @@ public class WorkExperienceConstraint extends SoftConstraint {
 		Collection<Student> students = project.getStudents();
 		
 		for (Student member : students) {
-			if (member.getGpa() >= EXPERIENCE) {
+			if (member.getExperience() >= EXPERIENCE) {
 				return true;
 			}
 		}
