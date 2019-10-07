@@ -9,6 +9,7 @@ import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
 import model.ProjectImpl;
+import model.RoleRequirement;
 import model.constraints.SoftConstraint;
 
 public class SQLConnectionImpl implements SQLConnection {
@@ -101,6 +102,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	@Override
 	public Collection<Project> getAllProjects() {
 		List<Project> projects = new ArrayList<>();
+		
 		String query = "SELECT * FROM Project;";
 
 		try {
@@ -108,7 +110,7 @@ public class SQLConnectionImpl implements SQLConnection {
 			ResultSet rs = state.executeQuery(query);
 
 			while (rs.next()) {
-				Project project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
+				Project project = new ProjectImpl(rs.getString(1), rs.getString(2), new ArrayList<RoleRequirement>());
 				projects.add(project);
 
 			}
@@ -193,7 +195,7 @@ public class SQLConnectionImpl implements SQLConnection {
 
 				if (rs.next()) {
 					// TODO: use another project constructor
-					project = new ProjectImpl(rs.getString(1), rs.getString(2), null);
+					project = new ProjectImpl(rs.getString(1), rs.getString(2), new ArrayList<RoleRequirement>());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();

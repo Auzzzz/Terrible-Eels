@@ -32,10 +32,10 @@ public class Menu {
 			input = scanner.nextLine().toLowerCase();
 
 			System.out.println("Please Enter Username: ");
-			String username = scanner.next();
+			String username = scanner.nextLine();
 
 			System.out.println("Please Enter Password: ");
-			String password = scanner.next();
+			String password = scanner.nextLine();
 
 			if (input.compareTo("student") == 0) {
 
@@ -48,7 +48,10 @@ public class Menu {
 				System.out.println("You are now logged in " + USERNAME);
 				displayMenu(username, input, scanner);
 			}else {
-				System.out.println("Invalid Username and Password" + USERNAME + PASSWORD);
+				System.out.println("Invalid Username and Password");
+				username = " ";
+				password = " ";
+				input = " ";
 			}
 		}
 	}
