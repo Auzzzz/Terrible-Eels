@@ -106,7 +106,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * Find a RoleRequirement of Project of which Role matches with the student's preference on Role.
 	 * Return null if no matching Role was found.
 	 * 
-	 * @param state
 	 * @param project
 	 * @param student
 	 * @return - a RoleRequirement with matching Role
@@ -132,7 +131,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * with one of the student's Skills.
 	 * Return null if no matching Skill was found.
 	 * 
-	 * @param state
 	 * @param project
 	 * @param student
 	 * @return - a RoleRequirement with matching Skill
@@ -166,7 +164,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * the student has (Role 1 - Skill 1, Skill 4), then a RoleRequirement for Role1 is returned
 	 * because (Role 1 - Skill 1) pair appears in the student's.
 	 * 
-	 * @param state
 	 * @param project
 	 * @param student
 	 * @return - a RoleRequirement with matching Skill
@@ -304,7 +301,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * The total fitness score is the addition of the score based on students' preferences on projects
 	 * and another based on role requirement / preferences
 	 * 
-	 * @param state
 	 * @return - the result of all calculations, as a list of ProjectScoresData
 	 */
 	private Collection<ProjectScoresData> calcScores() {
@@ -333,7 +329,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	
 	/**
 	 * assign the student into the project
-	 * @param state
 	 * @param project
 	 * @param student
 	 */
@@ -358,7 +353,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * The student is assigned to the project only if the project has a Role that is preferred by the student,
 	 * while also meeting hard constraints.
 	 * 
-	 * @param state
 	 * @param project
 	 * @param student
 	 */
@@ -378,7 +372,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * The student is assigned to the project regardless of the project's role requirement,
 	 * if the hard constrains are met.
 	 * 
-	 * @param state
 	 * @param project
 	 * @param student
 	 */
@@ -402,7 +395,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * requirements) are assigned prior to others, as long as role requirement and hard constraints
 	 * are satisfied.
 	 * 
-	 * @param state
 	 * @throws InsufficientProjectsException
 	 * @throws InsufficientStudentsException
 	 */
@@ -451,10 +443,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * Attempts to assign students into projects ensuring hard constraints are met.
 	 * Students with higher 'score' for project (higher match to the project considering preferences and
 	 * requirements) are assigned prior to others as long as hard constraints are satisfied.
-	 * 
-	 * @param state
-	 * @throws InsufficientProjectsException
-	 * @throws InsufficientStudentsException
 	 */
 	private void assignStudentsPhase2() {
 		// data of all student's score for each project
@@ -484,20 +472,62 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	}
 	
 	/**
-	 * Wrapper method for the assignment phase 1 and 2 
+	 * The third phase of assigning students.
+	 * Attempts to assign students into projects ensuring the role requirements of projects are met,
+	 * but ignoring hard constraints.
+	 */
+	private void assignStudentsPhase3() {
+		// data of all student's score for each project
+		Collection<ProjectScoresData> scoresData = calcScores();
+		
+		// for each project, check all the students' scores for the project
+		for (ProjectScoresData scoresForProject : scoresData) {
+			Project project = scoresForProject.getProject();
+			
+			// consider each student in the order of score
+			for (StudentScore score : scoresForProject.getStudentScores()) {
+				
+				// if the project team has been formed
+				Project remainingProject = state.getRemainingProject(project.getId());
+				if ((remainingProject == null)) {
+					break;
+				}
+				
+				// if the student has not been assigned
+				Student student = score.getStudent();
+				Student remainingStudent = state.getRemainingStudent(student.getStudentNo());
+				if (remainingStudent != null) {
+					RoleRequirement roleMatch = getRoleMatch(project, student);
+					
+					if (roleMatch != null) {
+						assign(project, student);
+						state.removeRoleRequirement(project.getId(), roleMatch);
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Wrapper method for the assignment phase 1 - 3
 	 * 
-	 * @param state
 	 * @throws InsufficientProjectsException
 	 * @throws InsufficientStudentsException
 	 */
 	private void assignStudents() throws InsufficientProjectsException, InsufficientStudentsException {
 		assignStudentsPhase1();
-		assignStudentsPhase2();
+		
+		if (state.getRemainingStudents().size() != 0) {
+			assignStudentsPhase2();
+		}
+		
+		if (state.getRemainingStudents().size() != 0) {
+			assignStudentsPhase3();
+		}
 	}
 
 	/**
 	 * assign remaining students to any vacant project regardless of hard constraints
-	 * @param state
 	 */
 	private void forceAssign() {
 		List<Student> students = new ArrayList<>(state.getRemainingStudents());
