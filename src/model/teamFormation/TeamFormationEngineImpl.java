@@ -49,7 +49,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 */
 	private Project createTemporaryTeam(Student swapOut, Student swapIn) {
 		Project temp = new ProjectImpl(null, null, null);
-		Project project = connection.getProject(swapOut.getStudentNo());
+		Project project = connection.getProjectByStudentNo(swapOut.getStudentNo());
 		Collection<Student> tempMembers = project.getStudents();
 		tempMembers.remove(swapOut);
 		tempMembers.add(swapIn);
@@ -75,9 +75,13 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	public boolean swap(String sNo1, String sNo2, int acceptableChange) {
 		Student s1 = connection.getStudent(sNo1);
 		Student s2 = connection.getStudent(sNo2);
-		Project p1 = connection.getProject(sNo1);	// s1's original project	
-		Project p2 = connection.getProject(sNo2);	// s2's original project	
-		
+
+		Project project1 = connection.getProjectByStudentNo(sNo1);
+		Project project2 = connection.getProjectByStudentNo(sNo2);
+
+		Project p1 = connection.getProjectByStudentNo(sNo1);	// s1's original project	
+		Project p2 = connection.getProjectByStudentNo(sNo2);	// s2's original project	
+
 		// if s1 and s2 are from different projects
 		if (!((p1.getId()).equals(p2.getId()))) {
 			// temporary projects after students are swapped

@@ -4,7 +4,6 @@ import java.util.*;
 
 import enums.Gender;
 import enums.PersonalityType;
-import enums.Role;
 import interfaces.*;
 
 public class StudentImpl implements Student {
@@ -16,13 +15,13 @@ public class StudentImpl implements Student {
 	int experience;
 	double gpa;
 	ArrayList<Project> projectPreferences = new ArrayList<Project>();
-	ArrayList<Role> rolePreferences = new ArrayList<Role>();
+	ArrayList<RoleRequirement> rolePreferences = new ArrayList<RoleRequirement>();
 	ArrayList<Student> blacklist = new ArrayList<Student>();
 	
 	public StudentImpl(String name, String studentNo, PersonalityType personalityType, 
 		Gender gender, int experience, double gpa, 
 		Collection<Project> projectPreferences, 
-		Collection<Role> rolePreferences, 
+		Collection<RoleRequirement> rolePreferences, 
 		Collection<Student> blacklist) {
 		
 		this.name = name;
@@ -31,6 +30,9 @@ public class StudentImpl implements Student {
 		this.gender = gender;
 		this.experience = experience;
 		this.gpa = gpa;
+		this.projectPreferences = (ArrayList<Project>) projectPreferences;
+		this.rolePreferences = (ArrayList<RoleRequirement>) rolePreferences;
+		this.blacklist = (ArrayList<Student>) blacklist;
 		/* TODO: 
 		 * projectPreferences
 		 * rolePreferences
@@ -71,8 +73,28 @@ public class StudentImpl implements Student {
 
 	@Override
 	public Collection<RoleRequirement> getRolePreferences() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.rolePreferences;
+	}
+
+	@Override
+	public void setPreferences(Collection<Project> projects) {
+		
+		this.projectPreferences = (ArrayList<Project>) projects;
+		
+	}
+
+	@Override
+	public void setRolePreferences(Collection<RoleRequirement> roles) {
+		
+		this.rolePreferences = (ArrayList<RoleRequirement>) roles;
+		
+	}
+
+	@Override
+	public void addBlacklist(Student student) {
+
+		this.blacklist.add(student);
+
 	}
 
 	@Override
