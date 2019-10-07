@@ -57,7 +57,7 @@ public interface SQLConnection {
 	 * @param studentNo - student number of the student who belongs to the project
 	 * @return - project
 	 */
-	Project getProject(String studentNo);
+	Project getProjectByStudentNo(String studentNo);
 	
 	/**
 	 * update a project with the data of the given project
@@ -84,4 +84,6 @@ public interface SQLConnection {
 	 * @return - student
 	 */
 	Student getStudent(String studentNo);
+
+	Project getProjectByDesc(String desc);
 }

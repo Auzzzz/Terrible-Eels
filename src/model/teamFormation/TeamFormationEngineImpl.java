@@ -45,8 +45,8 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	public boolean swap(String sNo1, String sNo2, int acceptableChange) {
 		Student s1 = connection.getStudent(sNo1);
 		Student s2 = connection.getStudent(sNo2);
-		Project project1 = connection.getProject(sNo1);
-		Project project2 = connection.getProject(sNo2);
+		Project project1 = connection.getProjectByStudentNo(sNo1);
+		Project project2 = connection.getProjectByStudentNo(sNo2);
 		
 		if (!((project1.getId()).equals(project2.getId()))) {
 			// create temporary teams

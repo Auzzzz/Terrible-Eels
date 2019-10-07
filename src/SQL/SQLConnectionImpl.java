@@ -211,7 +211,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	public void saveProject(Project project) {
 		// TODO Auto-generated method stub
 		// INSERT INTO Project Values ( NULL , 'Test DESC', 'Req', NULL)
-		// Can leave first Null, DESC, Requirments, Null if Client not known)
+		// Can leave first Null, DESC, Requirements, Null if Client not known)
 	}
 
 	@Override
@@ -228,13 +228,19 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public Project getProject(String studentNo) {
+	public Project getProjectByStudentNo(String studentNo) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Student getStudent(String studentNo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Project getProjectByDesc(String desc) {
 		// TODO Auto-generated method stub
 		return null;
 	}

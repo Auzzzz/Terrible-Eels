@@ -49,4 +49,23 @@ public interface Student {
 	 * @return - a collection of RoleRequirements
 	 */
 	Collection<RoleRequirement> getRolePreferences(); 
+	
+	/**
+	 * Sets a student's preferences
+	 * @param projects
+	 */
+	void setPreferences(Collection<Project> projects);
+	
+	/**
+	 * Sets a student's preferred roles and skills
+	 * @param roles
+	 */
+	void setRolePreferences(Collection<RoleRequirement> roles);
+	
+	/**
+	 * Adds a student to this student's blacklist
+	 * @param student
+	 */
+	void addBlacklist(Student student);
+	
 }

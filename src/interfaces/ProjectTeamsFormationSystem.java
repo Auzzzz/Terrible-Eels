@@ -70,5 +70,7 @@ public interface ProjectTeamsFormationSystem {
 	 * @param studentID
 	 * @param roles
 	 */
-	void setRoles(String studentID, Collection<RoleRequirement> roles);	
+	void setRoles(String studentID, Collection<RoleRequirement> roles);
+
+	boolean checkStudentNum(String studentNo);	
 }

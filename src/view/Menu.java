@@ -19,8 +19,8 @@ public class Menu {
 
 	public void run() {
 
-		String Username = "user";
-		String Password = "111";
+		final String USERNAME = "user";
+		final String PASSWORD = "111";
 
 		SQL = new SQLConnectionImpl();
 		system = new ProjectTeamsFormationSystemImpl(SQL);
@@ -41,11 +41,14 @@ public class Menu {
 
 			}
 
-			if (username.equals(Username) && password.equals(Password)) {
-				System.out.println("You are now logged in " + Username);
+			if (username.equals(USERNAME) && password.equals(PASSWORD)) {
+				System.out.println("You are now logged in " + USERNAME);
 				displayMenu(username, input, scanner);
-			} else {
-				System.out.println("Invalid Username and Password" + Username + Password);
+			} else if(system.checkStudentNum(username) && password.equals(PASSWORD)){
+				System.out.println("You are now logged in " + USERNAME);
+				displayMenu(username, input, scanner);
+			}else {
+				System.out.println("Invalid Username and Password" + USERNAME + PASSWORD);
 			}
 		}
 	}
@@ -93,7 +96,7 @@ public class Menu {
 				system.addToBlacklist(username, scanner.nextLine());
 				break;
 			case "3":
-
+				system.setRoles(username, promptRoles(scanner));
 				break;
 			case "4":
 				user = "exit";

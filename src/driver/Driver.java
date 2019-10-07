@@ -21,7 +21,10 @@ public class Driver {
       //---------------------------\\
 
 		//new GUI_Menu();
-		new GUIMenu_Login();
+		//new GUIMenu_Login();
+		
+		Menu menu = new Menu();
+		menu.run();
 
 	}
 
