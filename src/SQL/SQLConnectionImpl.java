@@ -102,7 +102,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	@Override
 	public Collection<Project> getAllProjects() {
 		List<Project> projects = new ArrayList<>();
-		
+
 		String query = "SELECT * FROM Project;";
 
 		try {
@@ -132,16 +132,14 @@ public class SQLConnectionImpl implements SQLConnection {
 		List<Student> student = new ArrayList<Student>();
 		String query = "SELECT StuID from Student WHERE Gender = 'F';";
 
-		
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
-			
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return student;
 
 	}
@@ -214,11 +212,31 @@ public class SQLConnectionImpl implements SQLConnection {
 		// TODO Auto-generated method stub
 		// INSERT INTO Project Values ( NULL , 'Test DESC', 'Req', NULL)
 		// Can leave first Null, DESC, Requirements, Null if Client not known)
+		String query = "SELECT StuID from Student WHERE Gender = 'F';";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		// return student;
+
 	}
 
 	@Override
 	public void saveConstraint(String desc, int weight) {
-		// TODO Auto-generated method stub
+		String query = "INSERT INTO SoftConstraint (Desc, Weight) VALUES (" + desc + "," + weight + ");";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -226,12 +244,22 @@ public class SQLConnectionImpl implements SQLConnection {
 	public void updateProject(Project project1) {
 		// TODO Auto-generated method stub
 		// UPDATE Project Set Desc = 'THis is a update' WHERE ProID = '2'
+		String query = "UPDATE Project Set Desc = 'THis is a update' WHERE ProID = " + project1 + ");";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 
 	@Override
 	public Project getProjectByStudentNo(String studentNo) {
-		// TODO Auto-generated method stub
+		// SELECT StuID, ProID FROM Teams WHERE StuID =' + studentNo + ';'
+		// SELECT * FROM Project WHERE ProID = 1;
 		return null;
 	}
 
@@ -242,9 +270,10 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public Project getProjectByDesc(String desc) { 
-		// TODO Auto-generated method stub
-		return null;
+	public Project getProjectByDesc(String desc) {
+		// SELECT * FROM Student WHERE StuID = " + studentNo + ";"
+				return null;
+		
 	}
 }
 
