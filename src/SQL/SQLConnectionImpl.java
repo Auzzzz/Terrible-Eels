@@ -242,7 +242,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public Project getProjectByDesc(String desc) {
+	public Project getProjectByDesc(String desc) { 
 		// TODO Auto-generated method stub
 		return null;
 	}

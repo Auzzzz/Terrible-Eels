@@ -68,7 +68,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 
 	@Override
 	public void setPreferences(String studentID, Collection<String> projectIDs) {
-		Student student = connection.getStudent(studentID);
+		Student student = connection.getStudent(studentID); 
 		ArrayList<Project> projects = new ArrayList<Project>();
 		projectIDs.forEach(p -> {
 			projects.add(connection.getProjectByDesc(p));
