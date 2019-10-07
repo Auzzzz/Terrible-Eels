@@ -75,10 +75,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	public boolean swap(String sNo1, String sNo2, int acceptableChange) {
 		Student s1 = connection.getStudent(sNo1);
 		Student s2 = connection.getStudent(sNo2);
-
-		Project project1 = connection.getProjectByStudentNo(sNo1);
-		Project project2 = connection.getProjectByStudentNo(sNo2);
-
 		Project p1 = connection.getProjectByStudentNo(sNo1);	// s1's original project	
 		Project p2 = connection.getProjectByStudentNo(sNo2);	// s2's original project	
 
@@ -521,11 +517,11 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	private void assignStudents() throws InsufficientProjectsException, InsufficientStudentsException {
 		assignStudentsPhase1();
 		
-		if (state.getRemainingStudents().size() != 0) {
+		if (state.getRemainingStudents().size() > 0) {
 			assignStudentsPhase2();
 		}
 		
-		if (state.getRemainingStudents().size() != 0) {
+		if (state.getRemainingStudents().size() > 0) {
 			assignStudentsPhase3();
 		}
 	}
