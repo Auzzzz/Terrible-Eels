@@ -85,5 +85,17 @@ public interface SQLConnection {
 	 */
 	Student getStudent(String studentNo);
 
+	/**
+	 * Gets a project by it's description
+	 * @param desc
+	 * @return
+	 */
 	Project getProjectByDesc(String desc);
+	
+	/**
+	 * Updates the database to reflect changes in a student object
+	 * @param student
+	 */
+	void updateStudent(Student student);
+	
 }

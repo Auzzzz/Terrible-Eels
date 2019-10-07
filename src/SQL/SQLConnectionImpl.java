@@ -246,4 +246,10 @@ public class SQLConnectionImpl implements SQLConnection {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void updateStudent(Student student) {
+		// TODO Auto-generated method stub
+		
+	}
 }
