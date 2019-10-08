@@ -99,8 +99,7 @@ public class StudentImpl implements Student {
 
 	@Override
 	public double getExperience() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.experience;
 	}
 
 	

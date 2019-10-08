@@ -1,9 +1,7 @@
 package driver;
 
 import java.awt.EventQueue;
-
 import javax.swing.SwingUtilities;
-
 import view.GUIMenu;
 import view.GUIMenu.GUI_Menu;
 import view.GUIMenu_Login;

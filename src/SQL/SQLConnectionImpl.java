@@ -5,15 +5,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import enums.Gender;
+import enums.PersonalityType;
 import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
 import model.ProjectImpl;
 import model.RoleRequirement;
+import model.StudentImpl;
 import model.constraints.SoftConstraint;
 
 public class SQLConnectionImpl implements SQLConnection {
 	private static Connection conn = null;
+	private final String STUDENT_ID = "StuID";
+	private final String GENDER = "gender";
+	private final String PERSONALITY_TYPE = "PersonType";
+	private final String WORK_EXPERIENCE = "WorkExp";
+	private final String GPA = "GPA";
+	private final String ROLE = "Role";
+	private final String NAME = "Name";
 
 	public SQLConnectionImpl() {
 		try {
@@ -264,23 +274,73 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public Student getStudent(String studentNo) {
-		// TODO Auto-generated method stub
+	public Project getProjectByDesc(String desc) {
+		// SELECT * FROM Student WHERE StuID = " + studentNo + ";"
 		return null;
+
 	}
 
 	@Override
-	public Project getProjectByDesc(String desc) {
-		// SELECT * FROM Student WHERE StuID = " + studentNo + ";"
-				return null;
-		
+	public Student getStudent(String studentNo) {
+
+		Student student = null;
+		String query = "SELECT * FROM Student WHERE StuID = " + studentNo + ";";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+			List<Project> projectPreferences = new ArrayList<Project>();
+			List<RoleRequirement> rolePreferences = new ArrayList<RoleRequirement>();
+			List<Student> blacklist = new ArrayList<Student>();
+
+			if (rs.next()) {
+				student = new StudentImpl(rs.getString(STUDENT_ID), "name", toPersonalityType(rs.getString(PERSONALITY_TYPE)),
+						toGender(rs.getString(GENDER)), rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA),
+						projectPreferences, rolePreferences, blacklist);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return student;
 	}
 
 	@Override
 	public void updateStudent(Student student) {
-		// TODO Auto-generated method stub
-		
+		String query = "UPDATE Student SET " + 
+						GENDER + " = '" + student.getGender() + "', " +
+						PERSONALITY_TYPE + " = '" + student.getPersonalityType() + "', " +
+						WORK_EXPERIENCE + " = '" + student.getExperience() + "', " +
+						GPA + " = '" + student.getGpa() + "', " +
+						//ROLE + " = '" + student.getStudentNo() + ", " +
+						NAME + " = '" + student.getName() +
+						"' WHERE " + STUDENT_ID + " = '" + student.getStudentNo() + "';";
+		try {
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.executeUpdate();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private PersonalityType toPersonalityType(String personalityType) {
+
+		for(PersonalityType p : PersonalityType.values()) {
+			if(p.toString().equalsIgnoreCase(personalityType)) {
+				return p;
+			}
+		}
+		return null;
+	}
+
+	private Gender toGender(String gender) {
+
+		for(Gender p : Gender.values()) {
+			if(p.toString().equalsIgnoreCase(gender)) {
+				return p;
+			}
+		}
+		return null;
 	}
 }
-
-//test
