@@ -97,7 +97,7 @@ public class SQLConnectionImpl implements SQLConnection {
 			ResultSet rs = state.executeQuery(query);
 
 			while (rs.next()) {
-				// Student student = new
+				// Student student = new StudentImpl();
 				// Student.add(student);
 			}
 
@@ -246,9 +246,6 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public void saveProject(Project project) {
-		// TODO Auto-generated method stub
-		// INSERT INTO Project Values ( NULL , 'Test DESC', 'Req', NULL)
-		// Can leave first Null, DESC, Requirements, Null if Client not known)
 		String query = "SELECT StuID from Student WHERE Gender = 'F';";
 
 		try {
@@ -258,8 +255,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		// return student;
 
 	}
 
@@ -279,13 +274,11 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public void updateProject(Project project1) {
-		// TODO Auto-generated method stub
-		// UPDATE Project Set Desc = 'THis is a update' WHERE ProID = '2'
-		String query = "UPDATE Project Set Desc = 'THis is a update' WHERE ProID = " + project1 + ");";
+		//String query = "UPDATE Project Set Desc = 'THis is a update' WHERE ProID = " + project1 + ");";
 
 		try {
 			Statement state = conn.createStatement();
-			state.executeQuery(query);
+			//state.executeQuery(query);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -297,7 +290,17 @@ public class SQLConnectionImpl implements SQLConnection {
 	public Project getProjectByStudentNo(String studentNo) {
 		// SELECT StuID, ProID FROM Teams WHERE StuID =' + studentNo + ';'
 		// SELECT * FROM Project WHERE ProID = 1;
-		return null;
+		Project pdsc = null;
+		String query = "select * from Project P where P.Desc ='" + studentNo + "';'";
+
+		try {
+			Statement state = conn.createStatement();
+			state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return pdsc;
 	}
 
 	@Override
