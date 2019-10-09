@@ -63,7 +63,8 @@ public class Menu {
 			System.out.println("*******************************************");
 			System.out.println("Press 1 to Enter Project Preferences");
 			System.out.println("Press 2 to Blacklist Members");
-			System.out.println("Press 3 to Specify Preferred Roles");
+			System.out.println("Press 3 to "
+					+ "Preferred Roles");
 			System.out.println("Press 4 to exit");
 			System.out.println("*******************************************");
 

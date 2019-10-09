@@ -378,4 +378,15 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 		return null;
 	}
+	
+	//INSERT INTO Student (Gender,PT, WorkExp, GPA,Role, name) VALUES ("MALE",'2', 2005, 5.2, "THIS","Test");
+	//INSERT INTO Preferences (StuID, ProID, Weight) VALUES (5, 1, 4);
+	//
+	
+	
+	
+	
+	
+	
+	
 }
