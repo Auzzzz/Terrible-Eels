@@ -32,12 +32,11 @@ public interface ProjectTeamsFormationSystem {
 	
 	/**
 	 * form teams by assigning students into projects
-	 * @return - all formed projects
+	 * @return - all formed projects in string format
 	 * @throws InsufficientStudentsException 
 	 * @throws InsufficientProjectsException 
-	 * @throws RemainedStudentsException 
 	 */
-	Collection<Project> formTeams() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+	Collection<String> formTeams() throws InsufficientProjectsException, InsufficientStudentsException;
 
 	/**
 	 * save all formed projects 

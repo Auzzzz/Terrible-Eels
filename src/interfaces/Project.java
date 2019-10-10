@@ -45,4 +45,6 @@ public interface Project {
 	 */
 	Collection<RoleRequirement> getRoleRequirements();
 
+	
+    String toString();
 }

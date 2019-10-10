@@ -579,4 +579,9 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 			formedProjects.forEach(connection::saveProject);
 		}
 	}
+	
+	@Override
+	public int getFitnessValue(Project project) {
+		return validator.calculateFit(project);
+	}
 }
