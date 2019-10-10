@@ -7,6 +7,8 @@ import java.util.List;
 
 import enums.Gender;
 import enums.PersonalityType;
+import enums.Role;
+import enums.Skill;
 import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
@@ -272,20 +274,50 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	}
 
-	// auto increment project ID on the database
-	// convert ID into string when returning Pro
 	@Override
 	public void insertProject(String desc, Collection<RoleRequirement> roles) {
-		//String query = "UPDATE Project Set Desc = 'THis is a update' WHERE ProID = " + project1 + ");";
-
+		String query = "INSERT INTO Project (Desc) VALUES (?);";
+		PreparedStatement prep;
+		int projectId;
+		
 		try {
-			Statement state = conn.createStatement();
-			//state.executeQuery(query);
-
+			prep = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			prep.setString(1, desc);
+			prep.execute();
+			
+			ResultSet generatedKeys = prep.getGeneratedKeys();
+			if (generatedKeys.next()) {
+				long lastId = generatedKeys.getLong(1);
+				projectId = Long.valueOf(lastId).intValue();
+				insertRoleRequirement(projectId, roles);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+	}
+	
+	private void insertRoleRequirement(int projectId, Collection<RoleRequirement> reqs) {
+		String query = "INSERT INTO RoleRequirements (ProID, RoleID, SkillID) VALUES (?, ?, ?);";
+		PreparedStatement prep;
+		
+		for (RoleRequirement req : reqs) {
+			Role role = req.getRole();
+			int roleId = role.getId();
+			Collection<Skill> skills = req.getSkills();
+			
+			for (Skill skill : skills) {
+				int skillId = skill.getId();
+				try {
+					prep = conn.prepareStatement(query);
+					prep.setInt(1, projectId);
+					prep.setInt(2, roleId);
+					prep.setInt(3, skillId);
+					prep.execute();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	@Override
