@@ -36,7 +36,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				projectDescs.add(project.getProjectDesc());
 			}
 		} catch (InsufficientStudentsException e) {
-			// e.printStackTrace();
+			System.out.println("Error: Insufficient Students");
 		}
 
 		return projectDescs;
@@ -99,9 +99,10 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	@Override
 	public void addProject(String desc, Collection<RoleRequirement> roles) {
 		// TODO Figure out how to set project ID
-		Project project = new ProjectImpl("ID", desc, roles);
-		connection.saveProject(project);
+//		Project project = new ProjectImpl("ID", desc, roles);
+//		connection.saveProject(project);
 
+		connection.insertProject(desc, roles);
 	}
 
 	@Override

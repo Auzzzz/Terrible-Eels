@@ -272,8 +272,10 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	}
 
+	// auto increment project ID on the database
+	// convert ID into string when returning Pro
 	@Override
-	public void updateProject(Project project1) {
+	public void insertProject(String desc, Collection<RoleRequirement> roles) {
 		//String query = "UPDATE Project Set Desc = 'THis is a update' WHERE ProID = " + project1 + ");";
 
 		try {
@@ -285,7 +287,7 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 
 	}
-
+	
 	@Override
 	public Project getProjectByStudentNo(String studentNo) {
 		// SELECT StuID, ProID FROM Teams WHERE StuID =' + studentNo + ';'

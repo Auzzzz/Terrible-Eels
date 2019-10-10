@@ -2,6 +2,7 @@ package interfaces;
 
 import java.util.Collection;
 
+import model.RoleRequirement;
 import model.constraints.SoftConstraint;
 
 public interface SQLConnection {
@@ -74,9 +75,10 @@ public interface SQLConnection {
 
 	/**
 	 * add a project to the database
-	 * @param project
+	 * @param desc
+	 * @param roles
 	 */
-	void updateProject(Project project);
+	void insertProject(String desc, Collection<RoleRequirement> roles);
 
 	/**
 	 * get a student with the give student number
@@ -97,5 +99,4 @@ public interface SQLConnection {
 	 * @param student
 	 */
 	void updateStudent(Student student);
-	
 }
