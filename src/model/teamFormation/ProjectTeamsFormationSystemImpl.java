@@ -102,4 +102,10 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		}
 	}
 
+	@Override
+	public String displayProjects(Collection<Project> projects) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

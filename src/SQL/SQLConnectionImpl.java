@@ -140,7 +140,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	@Override
 	public Collection<Student> getFemaleStudents() {
 		List<Student> student = new ArrayList<Student>();
-		String query = "SELECT StuID from Student WHERE Gender = 'F';";
+		String query = "SELECT StuID from Student WHERE Gender = 'FEMALE';";
 
 		try {
 			Statement state = conn.createStatement();
