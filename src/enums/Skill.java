@@ -1,9 +1,9 @@
 package enums;
 
 public enum Skill {
-	ORACLE(0),
-	JAVA(1),
-	CPLUSPLUS(2);
+	ORACLE(1),
+	JAVA(2),
+	CPLUSPLUS(3);
 	
 	private final int id;
 	

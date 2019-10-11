@@ -1,10 +1,10 @@
 package enums;
 
 public enum Role {
-	LEADER(0),
-	DBA(1),
-	PROGRAMMER(2),
-	UIDESIGNER(3);
+	LEADER(1),
+	DBA(2),
+	PROGRAMMER(3),
+	UIDESIGNER(4);
 	
 	private final int id;
 	
