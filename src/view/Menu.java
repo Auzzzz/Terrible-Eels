@@ -147,7 +147,7 @@ public class Menu {
 
 			case "3":
 				try {
-					System.out.println(system.formTeams()));
+					System.out.println(system.formTeams());
 				} catch (InsufficientProjectsException e) {
 					System.out.println(
 							"There were not enough projects to assign each student a team! Team Formation Failed.");
