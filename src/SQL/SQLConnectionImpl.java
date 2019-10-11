@@ -7,6 +7,8 @@ import java.util.List;
 
 import enums.Gender;
 import enums.PersonalityType;
+import enums.Role;
+import enums.Skill;
 import interfaces.Project;
 import interfaces.SQLConnection;
 import interfaces.Student;
@@ -22,7 +24,6 @@ public class SQLConnectionImpl implements SQLConnection {
 	private final String PERSONALITY_TYPE = "PersonType";
 	private final String WORK_EXPERIENCE = "WorkExp";
 	private final String GPA = "GPA";
-	private final String ROLE = "Role";
 	private final String NAME = "Name";
 
 	public SQLConnectionImpl() {
@@ -98,7 +99,7 @@ public class SQLConnectionImpl implements SQLConnection {
 			ResultSet rs = state.executeQuery(query);
 
 			while (rs.next()) {
-				// Student student = new
+				// Student student = new StudentImpl();
 				// Student.add(student);
 			}
 
@@ -133,8 +134,18 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public Collection<SoftConstraint> getAllSoftConstraints() {
-		// TODO Auto-generated method stub
-		return null;
+		List<SoftConstraint> softconstraint = new ArrayList<SoftConstraint>();
+		String query = "select * from SoftConstraint;";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return softconstraint;
 	}
 
 	@Override
@@ -144,7 +155,7 @@ public class SQLConnectionImpl implements SQLConnection {
 
 		try {
 			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
+			state.executeQuery(query);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -156,16 +167,34 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public Collection<Student> getMaleStudents() {
-		// TODO Auto-generated method stub
-		// SELECT StuID from Student WHERE Gender = 'M';
+		List<Student> student = new ArrayList<Student>();
+		String query = "SELECT StuID from Student WHERE Gender = 'M';";
 
-		return null;
+		try {
+			Statement state = conn.createStatement();
+			state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return student;
 	}
 
 	@Override
 	public Collection<Student> getOtherStudents() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Student> student = new ArrayList<Student>();
+		String query = "SELECT StuID from Student WHERE Gender = 'O';";
+
+		try {
+			Statement state = conn.createStatement();
+			state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return student;
 	}
 
 	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
@@ -219,20 +248,15 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public void saveProject(Project project) {
-		// TODO Auto-generated method stub
-		// INSERT INTO Project Values ( NULL , 'Test DESC', 'Req', NULL)
-		// Can leave first Null, DESC, Requirements, Null if Client not known)
 		String query = "SELECT StuID from Student WHERE Gender = 'F';";
 
 		try {
 			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
+			state.executeQuery(query);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		// return student;
 
 	}
 
@@ -242,7 +266,7 @@ public class SQLConnectionImpl implements SQLConnection {
 
 		try {
 			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
+			state.executeQuery(query);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -251,33 +275,81 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public void updateProject(Project project1) {
-		// TODO Auto-generated method stub
-		// UPDATE Project Set Desc = 'THis is a update' WHERE ProID = '2'
-		String query = "UPDATE Project Set Desc = 'THis is a update' WHERE ProID = " + project1 + ");";
-
+	public void insertProject(String desc, Collection<RoleRequirement> roles) {
+		String query = "INSERT INTO Project (Desc) VALUES (?);";
+		PreparedStatement prep;
+		int projectId;
+		
 		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-
+			prep = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			prep.setString(1, desc);
+			prep.execute();
+			
+			ResultSet generatedKeys = prep.getGeneratedKeys();
+			if (generatedKeys.next()) {
+				long lastId = generatedKeys.getLong(1);
+				projectId = Long.valueOf(lastId).intValue();
+				insertRoleRequirement(projectId, roles);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
-
+	
+	private void insertRoleRequirement(int projectId, Collection<RoleRequirement> reqs) {
+		String query = "INSERT INTO RoleRequirements (ProID, RoleID, SkillID) VALUES (?, ?, ?);";
+		PreparedStatement prep;
+		
+		for (RoleRequirement req : reqs) {
+			Role role = req.getRole();
+			int roleId = role.getId();
+			Collection<Skill> skills = req.getSkills();
+			
+			for (Skill skill : skills) {
+				int skillId = skill.getId();
+				try {
+					prep = conn.prepareStatement(query);
+					prep.setInt(1, projectId);
+					prep.setInt(2, roleId);
+					prep.setInt(3, skillId);
+					prep.execute();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	@Override
 	public Project getProjectByStudentNo(String studentNo) {
 		// SELECT StuID, ProID FROM Teams WHERE StuID =' + studentNo + ';'
 		// SELECT * FROM Project WHERE ProID = 1;
-		return null;
+		Project pdsc = null;
+		String query = "select * from Project P where P.Desc ='" + studentNo + "';'";
+
+		try {
+			Statement state = conn.createStatement();
+			state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return pdsc;
 	}
 
 	@Override
 	public Project getProjectByDesc(String desc) {
-		// SELECT * FROM Student WHERE StuID = " + studentNo + ";"
-		return null;
+		Project pdsc = null;
+		String query = "select * from Project P where P.Desc ='" + desc + "';'";
 
+		try {
+			Statement state = conn.createStatement();
+			state.executeQuery(query);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return pdsc;
 	}
 
 	@Override
@@ -294,9 +366,9 @@ public class SQLConnectionImpl implements SQLConnection {
 			List<Student> blacklist = new ArrayList<Student>();
 
 			if (rs.next()) {
-				student = new StudentImpl(rs.getString(STUDENT_ID), "name", toPersonalityType(rs.getString(PERSONALITY_TYPE)),
-						toGender(rs.getString(GENDER)), rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA),
-						projectPreferences, rolePreferences, blacklist);
+				student = new StudentImpl(rs.getString(STUDENT_ID), "name",
+						toPersonalityType(rs.getString(PERSONALITY_TYPE)), toGender(rs.getString(GENDER)),
+						rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA), projectPreferences, rolePreferences, blacklist);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -307,14 +379,11 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public void updateStudent(Student student) {
-		String query = "UPDATE Student SET " + 
-						GENDER + " = '" + student.getGender() + "', " +
-						PERSONALITY_TYPE + " = '" + student.getPersonalityType() + "', " +
-						WORK_EXPERIENCE + " = '" + student.getExperience() + "', " +
-						GPA + " = '" + student.getGpa() + "', " +
-						//ROLE + " = '" + student.getStudentNo() + ", " +
-						NAME + " = '" + student.getName() +
-						"' WHERE " + STUDENT_ID + " = '" + student.getStudentNo() + "';";
+		String query = "UPDATE Student SET " + GENDER + " = '" + student.getGender() + "', " + PERSONALITY_TYPE + " = '"
+				+ student.getPersonalityType() + "', " + WORK_EXPERIENCE + " = '" + student.getExperience() + "', "
+				+ GPA + " = '" + student.getGpa() + "', " +
+				// ROLE + " = '" + student.getStudentNo() + ", " +
+				NAME + " = '" + student.getName() + "' WHERE " + STUDENT_ID + " = '" + student.getStudentNo() + "';";
 		try {
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.executeUpdate();
@@ -326,8 +395,8 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	private PersonalityType toPersonalityType(String personalityType) {
 
-		for(PersonalityType p : PersonalityType.values()) {
-			if(p.toString().equalsIgnoreCase(personalityType)) {
+		for (PersonalityType p : PersonalityType.values()) {
+			if (p.toString().equalsIgnoreCase(personalityType)) {
 				return p;
 			}
 		}
@@ -336,11 +405,22 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	private Gender toGender(String gender) {
 
-		for(Gender p : Gender.values()) {
-			if(p.toString().equalsIgnoreCase(gender)) {
+		for (Gender p : Gender.values()) {
+			if (p.toString().equalsIgnoreCase(gender)) {
 				return p;
 			}
 		}
 		return null;
 	}
+	
+	//INSERT INTO Student (Gender,PT, WorkExp, GPA,Role, name) VALUES ("MALE",'2', 2005, 5.2, "THIS","Test");
+	//INSERT INTO Preferences (StuID, ProID, Weight) VALUES (5, 1, 4);
+	//
+	
+	
+	
+	
+	
+	
+	
 }

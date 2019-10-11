@@ -59,4 +59,18 @@ public class ProjectImpl implements Project {
 	public Collection<RoleRequirement> getRoleRequirements() {
 		return rolesReq;
 	}
+	
+	@Override
+    public String toString() { 
+		StringBuilder builder = new StringBuilder();
+		builder.append("ID: ").append(projectId).append('\n');
+		builder.append("Description: ").append(description).append('\n');
+		builder.append("Students: ").append('\n');
+		
+		for (String studentNo : students.keySet()) {
+			builder.append("- ").append(studentNo).append('\n');
+		}
+		
+		return builder.toString();
+	}
 }

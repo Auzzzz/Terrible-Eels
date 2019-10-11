@@ -39,4 +39,11 @@ public interface TeamFormationEngine {
 	 * save all formed projects 
 	 */
 	void confirmTeams();
+	
+	/**
+	 * get fitness value of the project
+	 * @param project
+	 * @return
+	 */
+	int getFitnessValue(Project project);
 }

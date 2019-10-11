@@ -36,7 +36,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 				projectDescs.add(project.getProjectDesc());
 			}
 		} catch (InsufficientStudentsException e) {
-			// e.printStackTrace();
+			System.out.println("Error: Insufficient Students");
 		}
 
 		return projectDescs;
@@ -48,9 +48,47 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	@Override
-	public Collection<Project> formTeams()
-			throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
-		return engine.formTeams();
+	public Collection<String> formTeams() throws InsufficientProjectsException, InsufficientStudentsException {
+		// each string is info of a project
+		Collection<String> results = new ArrayList<>();
+		Collection<Project> formedProjects;
+		Collection<Student> remainedStudents = new ArrayList<>();
+		
+		try {
+			formedProjects = engine.formTeams();
+			
+		} catch (RemainedStudentsException e) {
+			formedProjects = e.getFormedProjects();
+			remainedStudents = e.getRemainedStudents();
+		}
+		
+		for (Project project : formedProjects) {
+			int fitVal = engine.getFitnessValue(project);
+			String str = convertTeamToString(project, fitVal);
+			results.add(str);
+		}
+		
+		// if RemainedStudentsException was thrown, show remaining students as well after formed projects
+		if (!remainedStudents.isEmpty()) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Remaining Students: \n");
+			
+			for (Student student : remainedStudents) {
+				builder.append(student.getStudentNo()).append('\n');
+			}
+			
+			results.add(builder.toString());
+		}
+		
+		return results;
+	}
+	
+	private String convertTeamToString(Project project, int fitVal) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(project.toString()).append('\n');
+		builder.append("Fitness Value:" ).append(fitVal).append('\n');
+		
+		return builder.toString();
 	}
 
 	@Override
@@ -61,9 +99,10 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	@Override
 	public void addProject(String desc, Collection<RoleRequirement> roles) {
 		// TODO Figure out how to set project ID
-		Project project = new ProjectImpl("ID", desc, roles);
-		connection.saveProject(project);
+//		Project project = new ProjectImpl("ID", desc, roles);
+//		connection.saveProject(project);
 
+		connection.insertProject(desc, roles);
 	}
 
 	@Override
@@ -100,12 +139,6 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		} else {
 			return false;
 		}
-	}
-
-	@Override
-	public String displayProjects(Collection<Project> projects) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

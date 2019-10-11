@@ -30,14 +30,11 @@ public class StudentImpl implements Student {
 		this.gender = gender;
 		this.experience = experience;
 		this.gpa = gpa;
+		
+		// TODO ClassCastException?
 		this.projectPreferences = (ArrayList<Project>) projectPreferences;
 		this.rolePreferences = (ArrayList<RoleRequirement>) rolePreferences;
 		this.blacklist = (ArrayList<Student>) blacklist;
-		/* TODO: 
-		 * projectPreferences
-		 * rolePreferences
-		 * blacklist
-		 */
 	}
 	
 	@Override
@@ -52,8 +49,12 @@ public class StudentImpl implements Student {
 
 	@Override
 	public List<String> getProjectPreferences() {
-		// TODO 
-		return null;
+		List<String> preferences = new ArrayList<>();
+		for (Project project : projectPreferences) {
+			preferences.add(project.getId());
+		}
+		
+		return preferences;
 	}
 
 	@Override

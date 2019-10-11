@@ -33,6 +33,7 @@ public interface ProjectTeamsFormationSystem {
 	 */
 	boolean swap(String s1, String s2, int acceptableChange);
 
+	
 	/**
 	 * form teams by assigning students into projects
 	 * 
@@ -41,7 +42,7 @@ public interface ProjectTeamsFormationSystem {
 	 * @throws InsufficientProjectsException
 	 * @throws RemainedStudentsException
 	 */
-	Collection<Project> formTeams()
+	Collection<String> formTeams()
 			throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
 
 	/**
@@ -88,21 +89,4 @@ public interface ProjectTeamsFormationSystem {
 	 * @return
 	 */
 	boolean checkStudentNum(String studentNo);
-
-	/**
-	 * Generates a string containing the details of each project in the following
-	 * form (format doesn't work through javadoc, check the interface): 
-	 * 
-	 * Description: [project description] 				Overall Fitness: [project fitness]
-	 * 
-	 * 			Team Members: 
-	 * 				-[student1] 
-	 * 				-[student2] 
-	 * 				-[student3] 
-	 * 				-[student4]
-	 * 
-	 * @param projects
-	 * @return
-	 */
-	String displayProjects(Collection<Project> projects);
 }
