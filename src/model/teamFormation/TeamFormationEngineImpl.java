@@ -48,7 +48,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @return - temporary team
 	 */
 	private Project createTemporaryTeam(Student swapOut, Student swapIn) {
-		Project temp = new ProjectImpl(null, null);
+		Project temp = new ProjectImpl(null, null, null);
 		Project project = connection.getProjectByStudentNo(swapOut.getStudentNo());
 		Collection<Student> tempMembers = project.getStudents();
 		tempMembers.remove(swapOut);
@@ -402,15 +402,19 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		Collection<Student> students = state.getRemainingStudents();
 		Collection<Project> projects = state.getRemainingProjects();
 		
+		
 		// not enough students to form a team
 		if (students.size() < Project.TEAM_CAPACITY) {
 			throw new InsufficientStudentsException();
 		} 
 		
+		
 		// not enough projects for all students
+		/*
 		if ((students.size() / Project.TEAM_CAPACITY) > projects.size()) {
 			throw new InsufficientProjectsException();
 		}
+		*/
 		
 		// data of all student's score for each project
 		Collection<ProjectScoresData> scoresData = calcScores();

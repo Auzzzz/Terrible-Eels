@@ -6,14 +6,12 @@ import java.util.Scanner;
 import SQL.SQLConnectionImpl;
 import enums.Role;
 import enums.Skill;
-import interfaces.Project;
 import interfaces.ProjectTeamsFormationSystem;
 import interfaces.SQLConnection;
 import model.RoleRequirement;
 import model.teamFormation.InsufficientProjectsException;
 import model.teamFormation.InsufficientStudentsException;
 import model.teamFormation.ProjectTeamsFormationSystemImpl;
-import model.teamFormation.RemainedStudentsException;
 
 public class Menu {
 
@@ -66,8 +64,7 @@ public class Menu {
 			System.out.println("*******************************************");
 			System.out.println("Press 1 to Enter Project Preferences");
 			System.out.println("Press 2 to Blacklist Members");
-			System.out.println("Press 3 to "
-					+ "Preferred Roles");
+			System.out.println("Press 3 to enter Preferred Roles");
 			System.out.println("Press 4 to exit");
 			System.out.println("*******************************************");
 
@@ -147,7 +144,9 @@ public class Menu {
 
 			case "3":
 				try {
-					System.out.println(system.formTeams());
+					system.formTeams().forEach(s -> {
+						System.out.println(s);
+					});
 				} catch (InsufficientProjectsException e) {
 					System.out.println(
 							"There were not enough projects to assign each student a team! Team Formation Failed.");
@@ -155,10 +154,8 @@ public class Menu {
 					System.out.println(
 							"There were not enough students to assign a team to each project! Team Formation Failed.");
 					e.printStackTrace();
-				} catch (RemainedStudentsException e) {
-					System.out.println("There were students left over! Team Formation Failed.");
-					e.printStackTrace();
 				}
+
 				break;
 			case "4":
 				user = "exit";
@@ -189,6 +186,7 @@ public class Menu {
 			System.out.println((roleIndex + 2) + ". No more roles to add");
 			response = scanner.nextInt();
 			if (response == roleIndex + 2) {
+				role = null;
 				response = -1;
 			} else if (response > roles.length || response <= 0) {
 				System.out.println("Please enter a valid option");
@@ -215,19 +213,26 @@ public class Menu {
 					skills.add(skillsValues[response - 1]);
 				}
 			}
-			roleRequirements.add(new RoleRequirement(role, skills));
+			if (role != null) {
+				roleRequirements.add(new RoleRequirement(role, skills));
+			}
 		}
-
 		return roleRequirements;
 	}
 
 	private Collection<String> promptPreferences(Collection<String> projects, Scanner scanner) {
 		ArrayList<String> descriptions = (ArrayList<String>) projects;
 		ArrayList<String> preferences = new ArrayList<String>();
+		int index;
 
 		while (preferences.size() < 4) {
-			System.out.println("Please enter your first preference");
-			preferences.add(descriptions.get(scanner.nextInt() - 1));
+			System.out.println("Please enter a preference");
+			index = scanner.nextInt() - 1;
+			if (index > descriptions.size() || index < 0) {
+				System.out.println("Invalid preference.");
+			} else {
+				preferences.add(descriptions.get(index));
+			}
 		}
 		scanner.next();
 

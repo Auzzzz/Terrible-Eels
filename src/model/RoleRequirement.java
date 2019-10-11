@@ -44,4 +44,8 @@ public class RoleRequirement {
 		}
 		return result;
 	}
+
+	public void addSkill(Skill skill) {
+		skills.add(skill);
+	}
 }

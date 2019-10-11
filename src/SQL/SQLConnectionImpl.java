@@ -15,7 +15,7 @@ import interfaces.Student;
 import model.ProjectImpl;
 import model.RoleRequirement;
 import model.StudentImpl;
-import model.constraints.SoftConstraint;
+import model.constraints.*;
 
 public class SQLConnectionImpl implements SQLConnection {
 	private static Connection conn = null;
@@ -92,15 +92,14 @@ public class SQLConnectionImpl implements SQLConnection {
 	@Override
 	public Collection<Student> getAllStudents() {
 		List<Student> students = new ArrayList<Student>();
-		String query = "SELECT StuID from Student ORDER BY StuID ASC";
 
+		String query = "SELECT * from Student ORDER BY StuID ASC";
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
 
 			while (rs.next()) {
-				// Student student = new StudentImpl();
-				// Student.add(student);
+				students.add(createStudent(rs));
 			}
 
 		} catch (SQLException e) {
@@ -108,6 +107,84 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 
 		return students;
+	}
+
+	private Student createStudent(ResultSet rs) throws SQLException {
+		List<RoleRequirement> rolePreferences = new ArrayList<RoleRequirement>();
+		List<Student> blacklist = new ArrayList<Student>();
+		List<Project> projectPreferences = (List<Project>) getProjectPreferences(rs.getString(STUDENT_ID));
+
+		Student student = new StudentImpl(rs.getString(NAME), rs.getString(STUDENT_ID),
+				toPersonalityType(rs.getString(PERSONALITY_TYPE)), toGender(rs.getString(GENDER)),
+				rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA), projectPreferences, rolePreferences, blacklist);
+
+		return student;
+	}
+
+	private Collection<Project> getProjectPreferences(String StuID) {
+		String query = "SELECT * FROM Student_Project WHERE " + STUDENT_ID + " = '" + StuID + "';";
+		ArrayList<Project> projects = new ArrayList<Project>();
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			projects.add(getProjectByID(rs.getString("ProID1")));
+			projects.add(getProjectByID(rs.getString("ProID2")));
+			projects.add(getProjectByID(rs.getString("ProID3")));
+			projects.add(getProjectByID(rs.getString("ProID4")));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return projects;
+	}
+
+	private Project getProjectByID(String projectID) {
+		Project project = null;
+		String query = "select * from Project where ProID ='" + projectID + "';'";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+			project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), getRequirements(projectID));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return project;
+	}
+
+	private Collection<RoleRequirement> getRequirements(String projectID) {
+		ArrayList<RoleRequirement> roles = new ArrayList<RoleRequirement>();
+		ArrayList<Skill> skills = new ArrayList<Skill>();
+		String query = "SELECT Roles.RoleType, Skills.Name FROM Roles, RoleRequirements, Skills "
+				+ "WHERE (Roles.RoleID = RoleRequirements.RoleID) AND (Skills.ID = RoleRequirements.SkillID) AND RoleRequirements.ProID ='"
+				+ projectID + "';";
+		boolean alreadyAdded = false;
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				Role role = Role.valueOf(rs.getString("RoleType"));
+				for (int i = 0; i < roles.size(); i++) {
+					if (roles.get(i).getRole() == role) {
+						roles.get(i).addSkill(Skill.valueOf(rs.getString("name")));
+						alreadyAdded = true;
+					}
+				}
+				if (!alreadyAdded) {
+					roles.add(new RoleRequirement(role, skills));
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return roles;
 	}
 
 	@Override
@@ -121,7 +198,7 @@ public class SQLConnectionImpl implements SQLConnection {
 			ResultSet rs = state.executeQuery(query);
 
 			while (rs.next()) {
-				Project project = new ProjectImpl(rs.getString("Desc"), new ArrayList<RoleRequirement>());
+				Project project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), new ArrayList<RoleRequirement>());
 				projects.add(project);
 
 			}
@@ -134,67 +211,89 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public Collection<SoftConstraint> getAllSoftConstraints() {
-		List<SoftConstraint> softconstraint = new ArrayList<SoftConstraint>();
-		String query = "select * from SoftConstraint;";
+		List<SoftConstraint> softConstraints = new ArrayList<SoftConstraint>();
+		String query = "SELECT * FROM SoftConstraint;";
 
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
+			while(rs.next()) {
+				String desc = rs.getString("Desc");
+				switch(desc) {
+				case "WorkExperience":
+					softConstraints.add(new WorkExperienceConstraint(rs.getString("Desc"), rs.getInt("Weight")));
+					break;
+				case "PersonalityAorB":
+					softConstraints.add(new PersonalityAorBConstraint(rs.getString("Desc"), rs.getInt("Weight")));
+					break;
+				case "DifferentPersonalityTypes":
+					softConstraints.add(new WorkExperienceConstraint(rs.getString("Desc"), rs.getInt("Weight")));
+					break;
+				}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
 
-		return softconstraint;
+		return softConstraints;
 	}
 
 	@Override
 	public Collection<Student> getFemaleStudents() {
-		List<Student> student = new ArrayList<Student>();
-		String query = "SELECT StuID from Student WHERE Gender = 'FEMALE';";
+		List<Student> students = new ArrayList<Student>();
+		String query = "SELECT * from Student WHERE Gender = 'FEMALE';";
 
 		try {
 			Statement state = conn.createStatement();
-			state.executeQuery(query);
+			ResultSet rs = state.executeQuery(query);
+			while (rs.next()) {
+				students.add(createStudent(rs));
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return student;
+		return students;
 
 	}
 
 	@Override
 	public Collection<Student> getMaleStudents() {
-		List<Student> student = new ArrayList<Student>();
-		String query = "SELECT StuID from Student WHERE Gender = 'M';";
+		List<Student> students = new ArrayList<Student>();
+		String query = "SELECT * from Student WHERE Gender = 'MALE';";
 
 		try {
 			Statement state = conn.createStatement();
-			state.executeQuery(query);
+			ResultSet rs = state.executeQuery(query);
+			while (rs.next()) {
+				students.add(createStudent(rs));
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return student;
+		return students;
 	}
 
 	@Override
 	public Collection<Student> getOtherStudents() {
-		List<Student> student = new ArrayList<Student>();
-		String query = "SELECT StuID from Student WHERE Gender = 'O';";
+		List<Student> students = new ArrayList<Student>();
+		String query = "SELECT * from Student WHERE Gender = 'OTHER';";
 
 		try {
 			Statement state = conn.createStatement();
-			state.executeQuery(query);
+			ResultSet rs = state.executeQuery(query);
+			while (rs.next()) {
+				students.add(createStudent(rs));
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return student;
+		return students;
 	}
 
 	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
@@ -231,8 +330,7 @@ public class SQLConnectionImpl implements SQLConnection {
 				ResultSet rs = state.executeQuery(query);
 
 				if (rs.next()) {
-					// TODO: use another project constructor
-					project = new ProjectImpl(rs.getString("Desc"), new ArrayList<RoleRequirement>());
+					project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), new ArrayList<RoleRequirement>());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -363,14 +461,9 @@ public class SQLConnectionImpl implements SQLConnection {
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
-			List<Project> projectPreferences = new ArrayList<Project>();
-			List<RoleRequirement> rolePreferences = new ArrayList<RoleRequirement>();
-			List<Student> blacklist = new ArrayList<Student>();
 
 			if (rs.next()) {
-				student = new StudentImpl(rs.getString(STUDENT_ID), "name",
-						toPersonalityType(rs.getString(PERSONALITY_TYPE)), toGender(rs.getString(GENDER)),
-						rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA), projectPreferences, rolePreferences, blacklist);
+				student = createStudent(rs);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

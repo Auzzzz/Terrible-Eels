@@ -85,7 +85,11 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	
 	private String convertTeamToString(Project project, int fitVal) {
 		StringBuilder builder = new StringBuilder();
-		builder.append(project.toString()).append('\n');
+		builder.append("Description: " + project.getProjectDesc()).append('\n');
+		builder.append("Students: \n");
+		project.getStudents().forEach( s -> {
+			builder.append("-" + s.getName() + ", " + s.getGender() + ", GPA: " + s.getGpa() + ", Personality Type:" + s.getPersonalityType() + "\n");
+		});
 		builder.append("Fitness Value:" ).append(fitVal).append('\n');
 		
 		return builder.toString();
@@ -98,7 +102,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 
 	@Override
 	public void addProject(String desc, Collection<RoleRequirement> roles) {
-		Project project = new ProjectImpl(desc, roles);
+		Project project = new ProjectImpl(desc, null, roles);
 		connection.insertProject(project);
 	}
 

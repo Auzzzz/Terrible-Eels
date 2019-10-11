@@ -43,7 +43,7 @@ public interface ProjectTeamsFormationSystem {
 	 * @throws RemainedStudentsException
 	 */
 	Collection<String> formTeams()
-			throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException;
+			throws InsufficientProjectsException, InsufficientStudentsException;
 
 	/**
 	 * save all formed projects

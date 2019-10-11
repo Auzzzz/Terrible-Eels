@@ -1,8 +1,6 @@
 package interfaces;
 
 import java.util.Collection;
-
-import model.RoleRequirement;
 import model.constraints.SoftConstraint;
 
 public interface SQLConnection {
