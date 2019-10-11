@@ -98,11 +98,8 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 
 	@Override
 	public void addProject(String desc, Collection<RoleRequirement> roles) {
-		// TODO Figure out how to set project ID
-//		Project project = new ProjectImpl("ID", desc, roles);
-//		connection.saveProject(project);
-
-		connection.insertProject(desc, roles);
+		Project project = new ProjectImpl(desc, roles);
+		connection.insertProject(project);
 	}
 
 	@Override

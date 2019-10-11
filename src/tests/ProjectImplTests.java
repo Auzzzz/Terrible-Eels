@@ -22,7 +22,7 @@ public class ProjectImplTests {
 	public void addFourRoles() {
 		ArrayList<RoleRequirement> roles = createRoles(4);
 		
-		project = new ProjectImpl("123", "Test Project", roles);
+		project = new ProjectImpl("Test Project", roles);
 		assert(project.getRoleRequirements() == roles);
 	}
 	
@@ -30,13 +30,13 @@ public class ProjectImplTests {
 	public void addFiveRoles() {
 		ArrayList<RoleRequirement> roles = createRoles(5);
 		
-		project = new ProjectImpl("123", "Test Project", roles);
+		project = new ProjectImpl("Test Project", roles);
 	}
 	
 	@Test
 	public void addFourStudents() {
 		ArrayList<RoleRequirement> roles = createRoles(4);
-		project = new ProjectImpl("123", "Test Project", roles);
+		project = new ProjectImpl("Test Project", roles);
 		addStudents(project, 4);
 		
 		assert(project.getStudents().size() == 4);
@@ -45,7 +45,7 @@ public class ProjectImplTests {
 	@Test(expected = TooManyStudentsException.class) 
 	public void addFiveStudents() {
 		ArrayList<RoleRequirement> roles = createRoles(4);
-		project = new ProjectImpl("123", "Test Project", roles);
+		project = new ProjectImpl("Test Project", roles);
 		addStudents(project, 5);
 	}
 	

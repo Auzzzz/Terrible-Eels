@@ -121,7 +121,7 @@ public class SQLConnectionImpl implements SQLConnection {
 			ResultSet rs = state.executeQuery(query);
 
 			while (rs.next()) {
-				Project project = new ProjectImpl(rs.getString(1), rs.getString(2), new ArrayList<RoleRequirement>());
+				Project project = new ProjectImpl(rs.getString("Desc"), new ArrayList<RoleRequirement>());
 				projects.add(project);
 
 			}
@@ -140,10 +140,10 @@ public class SQLConnectionImpl implements SQLConnection {
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 
 		return softconstraint;
 	}
@@ -232,7 +232,7 @@ public class SQLConnectionImpl implements SQLConnection {
 
 				if (rs.next()) {
 					// TODO: use another project constructor
-					project = new ProjectImpl(rs.getString(1), rs.getString(2), new ArrayList<RoleRequirement>());
+					project = new ProjectImpl(rs.getString("Desc"), new ArrayList<RoleRequirement>());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -275,36 +275,38 @@ public class SQLConnectionImpl implements SQLConnection {
 	}
 
 	@Override
-	public void insertProject(String desc, Collection<RoleRequirement> roles) {
+	public void insertProject(Project project) {
 		String query = "INSERT INTO Project (Desc) VALUES (?);";
 		PreparedStatement prep;
 		int projectId;
-		
+
 		try {
 			prep = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			prep.setString(1, desc);
+			prep.setString(1, project.getProjectDesc());
 			prep.execute();
-			
+
 			ResultSet generatedKeys = prep.getGeneratedKeys();
 			if (generatedKeys.next()) {
 				long lastId = generatedKeys.getLong(1);
 				projectId = Long.valueOf(lastId).intValue();
-				insertRoleRequirement(projectId, roles);
+				if (project.getRoleRequirements().size() > 0) {
+					insertRoleRequirement(projectId, project.getRoleRequirements());
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void insertRoleRequirement(int projectId, Collection<RoleRequirement> reqs) {
 		String query = "INSERT INTO RoleRequirements (ProID, RoleID, SkillID) VALUES (?, ?, ?);";
 		PreparedStatement prep;
-		
+
 		for (RoleRequirement req : reqs) {
 			Role role = req.getRole();
 			int roleId = role.getId();
 			Collection<Skill> skills = req.getSkills();
-			
+
 			for (Skill skill : skills) {
 				int skillId = skill.getId();
 				try {
@@ -319,7 +321,7 @@ public class SQLConnectionImpl implements SQLConnection {
 			}
 		}
 	}
-	
+
 	@Override
 	public Project getProjectByStudentNo(String studentNo) {
 		// SELECT StuID, ProID FROM Teams WHERE StuID =' + studentNo + ';'
@@ -412,15 +414,10 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 		return null;
 	}
-	
-	//INSERT INTO Student (Gender,PT, WorkExp, GPA,Role, name) VALUES ("MALE",'2', 2005, 5.2, "THIS","Test");
-	//INSERT INTO Preferences (StuID, ProID, Weight) VALUES (5, 1, 4);
+
+	// INSERT INTO Student (Gender,PT, WorkExp, GPA,Role, name) VALUES ("MALE",'2',
+	// 2005, 5.2, "THIS","Test");
+	// INSERT INTO Preferences (StuID, ProID, Weight) VALUES (5, 1, 4);
 	//
-	
-	
-	
-	
-	
-	
-	
+
 }
