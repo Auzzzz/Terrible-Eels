@@ -14,4 +14,15 @@ public enum Skill {
 	public int getId() {
 		return this.id;
 	}
+	
+	public static Skill getSkill(int skillId) {
+		for (Skill skill : Skill.values()) {
+			int id = skill.getId();
+			if (id == skillId) {
+				return skill;
+			}
+		}
+		
+		return null;
+	}
 }
