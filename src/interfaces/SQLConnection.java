@@ -78,7 +78,7 @@ public interface SQLConnection {
 	 * @param desc
 	 * @param roles
 	 */
-	void insertProject(String desc, Collection<RoleRequirement> roles);
+	void insertProject(Project project);
 
 	/**
 	 * get a student with the give student number

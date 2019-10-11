@@ -48,7 +48,7 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	 * @return - temporary team
 	 */
 	private Project createTemporaryTeam(Student swapOut, Student swapIn) {
-		Project temp = new ProjectImpl(null, null, null);
+		Project temp = new ProjectImpl(null, null);
 		Project project = connection.getProjectByStudentNo(swapOut.getStudentNo());
 		Collection<Student> tempMembers = project.getStudents();
 		tempMembers.remove(swapOut);

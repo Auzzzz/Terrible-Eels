@@ -1,16 +1,19 @@
 package view;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 import SQL.SQLConnectionImpl;
 import enums.Role;
 import enums.Skill;
+import interfaces.Project;
 import interfaces.ProjectTeamsFormationSystem;
 import interfaces.SQLConnection;
 import model.RoleRequirement;
+import model.teamFormation.InsufficientProjectsException;
+import model.teamFormation.InsufficientStudentsException;
 import model.teamFormation.ProjectTeamsFormationSystemImpl;
+import model.teamFormation.RemainedStudentsException;
 
 public class Menu {
 
@@ -44,10 +47,10 @@ public class Menu {
 			if (username.equals(USERNAME) && password.equals(PASSWORD)) {
 				System.out.println("You are now logged in " + USERNAME);
 				displayMenu(username, input, scanner);
-			} else if(system.checkStudentNum(username) && password.equals(PASSWORD)){
+			} else if (system.checkStudentNum(username) && password.equals(PASSWORD)) {
 				System.out.println("You are now logged in " + USERNAME);
 				displayMenu(username, input, scanner);
-			}else {
+			} else {
 				System.out.println("Invalid Username and Password");
 				username = " ";
 				password = " ";
@@ -73,30 +76,17 @@ public class Menu {
 			switch (input) {
 			case "1":
 				ArrayList<String> projects = (ArrayList<String>) system.getAllProjectDescs();
-				ArrayList<String> preferences = new ArrayList<String>();
-				
-				for(int i = 0; i < projects.size(); i++) {
+
+				for (int i = 0; i < projects.size(); i++) {
 					System.out.println(i + " " + projects.get(i));
 				}
-				
-				System.out.println("Please enter your first preference");
-				preferences.add(projects.get(scanner.nextInt()-1));
-				
-				System.out.println("Please enter your second preference");
-				preferences.add(projects.get(scanner.nextInt()-1));
-				
-				System.out.println("Please enter your third preference");
-				preferences.add(projects.get(scanner.nextInt()-1));
-				
-				System.out.println("Please enter your fourth preference");
-				preferences.add(projects.get(scanner.nextInt()-1));
-				system.setPreferences(username, preferences);
-				
+				system.setPreferences(username, promptPreferences(projects, scanner));
+
 				break;
 			case "2":
-				
+
 				System.out.println("Please enter the student number of the student you would like to blacklist:");
-				
+
 				system.addToBlacklist(username, scanner.nextLine());
 				break;
 			case "3":
@@ -139,7 +129,8 @@ public class Menu {
 			System.out.println("*******************************************");
 			System.out.println("Press 1 to Display All Projects ");
 			System.out.println("Press 2 to Display Popular Projects ");
-			System.out.println("Press 3 to exit");
+			System.out.println("Press 3 to Form Teams");
+			System.out.println("Press 4 to exit");
 			System.out.println("*******************************************");
 
 			input = scanner.nextLine();
@@ -155,6 +146,21 @@ public class Menu {
 				break;
 
 			case "3":
+				try {
+					System.out.println(system.formTeams());
+				} catch (InsufficientProjectsException e) {
+					System.out.println(
+							"There were not enough projects to assign each student a team! Team Formation Failed.");
+				} catch (InsufficientStudentsException e) {
+					System.out.println(
+							"There were not enough students to assign a team to each project! Team Formation Failed.");
+					e.printStackTrace();
+				} catch (RemainedStudentsException e) {
+					System.out.println("There were students left over! Team Formation Failed.");
+					e.printStackTrace();
+				}
+				break;
+			case "4":
 				user = "exit";
 				break;
 			default:
@@ -184,7 +190,7 @@ public class Menu {
 			response = scanner.nextInt();
 			if (response == roleIndex + 2) {
 				response = -1;
-			}else if (response > roles.length || response <= 0) {
+			} else if (response > roles.length || response <= 0) {
 				System.out.println("Please enter a valid option");
 				response = -2;
 			} else {
@@ -213,5 +219,18 @@ public class Menu {
 		}
 
 		return roleRequirements;
+	}
+
+	private Collection<String> promptPreferences(Collection<String> projects, Scanner scanner) {
+		ArrayList<String> descriptions = (ArrayList<String>) projects;
+		ArrayList<String> preferences = new ArrayList<String>();
+
+		while (preferences.size() < 4) {
+			System.out.println("Please enter your first preference");
+			preferences.add(descriptions.get(scanner.nextInt() - 1));
+		}
+		scanner.next();
+
+		return preferences;
 	}
 }

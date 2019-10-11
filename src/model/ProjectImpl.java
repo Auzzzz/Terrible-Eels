@@ -15,9 +15,7 @@ public class ProjectImpl implements Project {
 	String projectId;
 	String description;
 
-	public ProjectImpl(String projectId, String description, Collection<RoleRequirement> roles)
-			throws TooManyRolesException {
-		this.projectId = projectId;
+	public ProjectImpl(String description, Collection<RoleRequirement> roles) throws TooManyRolesException {
 		this.description = description;
 		if (roles.size() > 4) {
 			throw new TooManyRolesException();
@@ -59,18 +57,18 @@ public class ProjectImpl implements Project {
 	public Collection<RoleRequirement> getRoleRequirements() {
 		return rolesReq;
 	}
-	
+
 	@Override
-    public String toString() { 
+	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ID: ").append(projectId).append('\n');
 		builder.append("Description: ").append(description).append('\n');
 		builder.append("Students: ").append('\n');
-		
+
 		for (String studentNo : students.keySet()) {
 			builder.append("- ").append(studentNo).append('\n');
 		}
-		
+
 		return builder.toString();
 	}
 }
