@@ -23,6 +23,16 @@ public class ProjectImpl implements Project {
 			this.rolesReq = (ArrayList<RoleRequirement>) roles;
 		}
 	}
+	
+	public ProjectImpl(String projectId, String description, Collection<RoleRequirement> roles) throws TooManyRolesException {
+		this.projectId = projectId;
+		this.description = description;
+		if (roles.size() > 4) {
+			throw new TooManyRolesException();
+		} else {
+			this.rolesReq = (ArrayList<RoleRequirement>) roles;
+		}
+	}
 
 	@Override
 	public String getId() {
