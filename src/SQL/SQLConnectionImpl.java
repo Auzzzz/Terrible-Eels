@@ -198,7 +198,8 @@ public class SQLConnectionImpl implements SQLConnection {
 			ResultSet rs = state.executeQuery(query);
 
 			while (rs.next()) {
-				Project project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), new ArrayList<RoleRequirement>());
+				Project project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"),
+						new ArrayList<RoleRequirement>());
 				projects.add(project);
 
 			}
@@ -217,9 +218,9 @@ public class SQLConnectionImpl implements SQLConnection {
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
-			while(rs.next()) {
+			while (rs.next()) {
 				String desc = rs.getString("Desc");
-				switch(desc) {
+				switch (desc) {
 				case "WorkExperience":
 					softConstraints.add(new WorkExperienceConstraint(rs.getString("Desc"), rs.getInt("Weight")));
 					break;
@@ -298,8 +299,9 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
 		List<String> projectIds = new ArrayList<>();
-		String query = "SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT "
-				+ idealNumberOfProject + ";";
+		String query = String.format(
+				"SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT %d;",
+				idealNumberOfProject);
 
 		try {
 			Statement state = conn.createStatement();
@@ -315,7 +317,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		return projectIds;
 	}
 
-	// TODO - fix project instantiation - more data required
 	@Override
 	public Collection<Project> getPopularProjects(int idealNumberOfProjects) {
 		Collection<Project> projects = new ArrayList<>();
@@ -323,14 +324,30 @@ public class SQLConnectionImpl implements SQLConnection {
 
 		for (String projectId : projectIds) {
 			Project project = null;
-			String query = "SELECT * FROM Project WHERE ProID = " + projectId + ";";
+			String query = String.format("SELECT * FROM Project WHERE ProID = %s;", projectId);
 
 			try {
 				Statement state = conn.createStatement();
 				ResultSet rs = state.executeQuery(query);
 
 				if (rs.next()) {
-					project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), new ArrayList<RoleRequirement>());
+
+					project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"),
+							new ArrayList<RoleRequirement>());
+
+					int projectIntId = rs.getInt(1);
+					Collection<RoleRequirement> roles = getRoleRequirements(projectIntId);
+					project = new ProjectImpl("p" + projectIntId, rs.getString("Desc"), roles);
+
+					Collection<String> studentIds = getMembers(projectIntId);
+					for (String studentId : studentIds) {
+						Student member = getStudent(studentId);
+						project.addStudent(member);
+					}
+
+					// TODO: use another project constructor
+					// project = new ProjectImpl(rs.getString("Desc"), new
+					// ArrayList<RoleRequirement>());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -342,6 +359,67 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 
 		return projects;
+	}
+
+	private Collection<RoleRequirement> getRoleRequirements(int projectId) {
+		Collection<RoleRequirement> roles = new ArrayList<>();
+		String query = String.format("SELECT RoleId FROM RoleRequirements WHERE ProID = %d;", projectId);
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				int roleId = rs.getInt(1);
+				Role role = Role.getRole(roleId);
+				Collection<Skill> skills = getSkills(projectId, roleId);
+				roles.add(new RoleRequirement(role, skills));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return roles;
+	}
+
+	private Collection<Skill> getSkills(int projectId, int roleId) {
+		Collection<Skill> skills = new ArrayList<>();
+		String query = String.format("SELECT SkillID FROM RoleRequirements WHERE ProID = %d AND RoleID = %d;",
+				projectId, roleId);
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				int skillId = rs.getInt(1);
+				Skill skill = Skill.getSkill(skillId);
+				skills.add(skill);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return skills;
+	}
+
+	private Collection<String> getMembers(int projectId) {
+		Collection<String> memberIds = new ArrayList<>();
+		String query = String.format("SELECT StuID FROM Teams WHERE ProID = %d;", projectId);
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				String stuId = rs.getString(1);
+				memberIds.add(stuId);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return memberIds;
 	}
 
 	@Override

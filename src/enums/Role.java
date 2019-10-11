@@ -15,4 +15,15 @@ public enum Role {
 	public int getId() {
 		return this.id;
 	}
+	
+	public static Role getRole(int roleId) {
+		for (Role role : Role.values()) {
+			int id = role.getId();
+			if (id == roleId) {
+				return role;
+			}
+		}
+		
+		return null;
+	}
 }
