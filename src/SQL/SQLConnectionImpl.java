@@ -331,23 +331,15 @@ public class SQLConnectionImpl implements SQLConnection {
 				ResultSet rs = state.executeQuery(query);
 
 				if (rs.next()) {
-
-					project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"),
-							new ArrayList<RoleRequirement>());
-
 					int projectIntId = rs.getInt(1);
 					Collection<RoleRequirement> roles = getRoleRequirements(projectIntId);
-					project = new ProjectImpl("p" + projectIntId, rs.getString("Desc"), roles);
+					project = new ProjectImpl(rs.getString("Desc"), "p" + projectIntId, roles);
 
 					Collection<String> studentIds = getMembers(projectIntId);
 					for (String studentId : studentIds) {
 						Student member = getStudent(studentId);
 						project.addStudent(member);
 					}
-
-					// TODO: use another project constructor
-					// project = new ProjectImpl(rs.getString("Desc"), new
-					// ArrayList<RoleRequirement>());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();

@@ -2,6 +2,11 @@ package driver;
 
 import java.awt.EventQueue;
 import javax.swing.SwingUtilities;
+
+import SQL.SQLConnectionImpl;
+import interfaces.ProjectTeamsFormationSystem;
+import interfaces.SQLConnection;
+import model.teamFormation.ProjectTeamsFormationSystemImpl;
 import view.GUIMenu;
 import view.GUIMenu.GUI_Menu;
 import view.GUIMenu_Login;
@@ -21,7 +26,9 @@ public class Driver {
 		//new GUI_Menu();
 		//new GUIMenu_Login();
 		
-		Menu menu = new Menu();
+		SQLConnection SQL = new SQLConnectionImpl();
+		ProjectTeamsFormationSystem system = new ProjectTeamsFormationSystemImpl(SQL);
+		Menu menu = new Menu(system);
 		menu.run();
 
 	}

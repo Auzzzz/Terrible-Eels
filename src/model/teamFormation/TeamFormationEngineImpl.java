@@ -402,19 +402,15 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		Collection<Student> students = state.getRemainingStudents();
 		Collection<Project> projects = state.getRemainingProjects();
 		
-		
 		// not enough students to form a team
 		if (students.size() < Project.TEAM_CAPACITY) {
 			throw new InsufficientStudentsException();
 		} 
 		
-		
 		// not enough projects for all students
-		/*
 		if ((students.size() / Project.TEAM_CAPACITY) > projects.size()) {
 			throw new InsufficientProjectsException();
 		}
-		*/
 		
 		// data of all student's score for each project
 		Collection<ProjectScoresData> scoresData = calcScores();
@@ -569,11 +565,13 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		
 		// student(s) will remain if the number of all students is not divisible by team capacity
 		Collection<Student> remainders = state.getRemainingStudents();
+		Collection<Project> formedProjects = state.getFormedProjects();
+		
 		if (remainders.size() > 0) {
-			throw new RemainedStudentsException(remainders, state.getFormedProjects());
+			throw new RemainedStudentsException(remainders, formedProjects);
 		}
 		
-		return state.getFormedProjects();
+		return formedProjects;
 	}
 	
 	@Override
