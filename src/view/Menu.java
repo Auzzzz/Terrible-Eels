@@ -67,7 +67,7 @@ public class Menu {
 
 			switch (input) {
 			case "1":
-				ArrayList<String> projects = (ArrayList<String>) system.getAllProjectDescs();
+				ArrayList<String> projects = (ArrayList<String>) system.getPopularProjectDescs();
 
 				for (int i = 0; i < projects.size(); i++) {
 					System.out.println(i + " " + projects.get(i));
