@@ -3,28 +3,23 @@ package view;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
-import SQL.SQLConnectionImpl;
 import enums.Role;
 import enums.Skill;
 import interfaces.ProjectTeamsFormationSystem;
-import interfaces.SQLConnection;
 import model.RoleRequirement;
 import model.teamFormation.InsufficientProjectsException;
 import model.teamFormation.InsufficientStudentsException;
-import model.teamFormation.ProjectTeamsFormationSystemImpl;
 
 public class Menu {
-
-	SQLConnection SQL;
-	ProjectTeamsFormationSystem system;
+	private ProjectTeamsFormationSystem system;
+	
+	public Menu(ProjectTeamsFormationSystem system) {
+		this.system = system;
+	}
 
 	public void run() {
-
 		final String USERNAME = "user";
 		final String PASSWORD = "111";
-
-		SQL = new SQLConnectionImpl();
-		system = new ProjectTeamsFormationSystemImpl(SQL);
 		Scanner scanner = new Scanner(System.in);
 		String input = "";
 
