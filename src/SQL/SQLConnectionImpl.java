@@ -335,7 +335,6 @@ public class SQLConnectionImpl implements SQLConnection {
 					Collection<RoleRequirement> roles = getRoleRequirements(projectIntId);
 					
 					project = new ProjectImpl(rs.getString("Desc"), String.valueOf(projectIntId), roles);
-					project = new ProjectImpl(rs.getString("Desc"),  String.valueOf(projectIntId), roles);
 					Collection<String> studentIds = getMembers(projectIntId);
 					for (String studentId : studentIds) {
 						Student member = getStudent(studentId);
