@@ -45,6 +45,10 @@ public interface Project {
 	 */
 	Collection<RoleRequirement> getRoleRequirements();
 
+	/**
+	 * Removes any assigned students from the project
+	 */
+	void resetStudents();
 	
     String toString();
 }
