@@ -74,4 +74,10 @@ public interface Student {
 	 */
 	void addBlacklist(Student student);
 	
+	/**
+	 * Gets a list of the students blacklisted by this student
+	 * @return a collection of students
+	 */
+	Collection<Student> getBlacklist();
+	
 }

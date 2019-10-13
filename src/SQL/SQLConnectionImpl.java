@@ -35,23 +35,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 	}
 
-	public void getStudent() {
-		try {
-			Statement stmt = conn.createStatement();
-			ResultSet rs;
-
-			rs = stmt.executeQuery("SELECT StuID FROM Student");
-			while (rs.next()) {
-				String stuid = rs.getString("StuID");
-				System.out.println(stuid);
-			}
-			conn.close();
-		} catch (Exception e) {
-			System.err.println("Got an exception! ");
-			System.err.println(e.getMessage());
-		}
-	}
-
 	@Override
 	public int getStudentCount() {
 		String query = "SELECT COUNT(StuID) FROM Student;";
@@ -88,7 +71,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		return 0;
 	}
 
-//TODO: fix getallstudents
 	@Override
 	public Collection<Student> getAllStudents() {
 		List<Student> students = new ArrayList<Student>();
@@ -109,83 +91,7 @@ public class SQLConnectionImpl implements SQLConnection {
 		return students;
 	}
 
-	private Student createStudent(ResultSet rs) throws SQLException {
-		List<RoleRequirement> rolePreferences = new ArrayList<RoleRequirement>();
-		List<Student> blacklist = new ArrayList<Student>();
-		List<Project> projectPreferences = (List<Project>) getProjectPreferences(rs.getString(STUDENT_ID));
-
-		Student student = new StudentImpl(rs.getString(NAME), rs.getString(STUDENT_ID),
-				toPersonalityType(rs.getString(PERSONALITY_TYPE)), toGender(rs.getString(GENDER)),
-				rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA), projectPreferences, rolePreferences, blacklist);
-
-		return student;
-	}
-
-	private Collection<Project> getProjectPreferences(String StuID) {
-		String query = "SELECT * FROM Student_Project WHERE " + STUDENT_ID + " = '" + StuID + "';";
-		ArrayList<Project> projects = new ArrayList<Project>();
-
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-
-			projects.add(getProjectByID(rs.getString("ProID1")));
-			projects.add(getProjectByID(rs.getString("ProID2")));
-			projects.add(getProjectByID(rs.getString("ProID3")));
-			projects.add(getProjectByID(rs.getString("ProID4")));
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return projects;
-	}
-
-	private Project getProjectByID(String projectID) {
-		Project project = null;
-		String query = "select * from Project where ProID ='" + projectID + "';'";
-
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-			project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), getRequirements(projectID));
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return project;
-	}
-
-	private Collection<RoleRequirement> getRequirements(String projectID) {
-		ArrayList<RoleRequirement> roles = new ArrayList<RoleRequirement>();
-		ArrayList<Skill> skills = new ArrayList<Skill>();
-		String query = "SELECT Roles.RoleType, Skills.Name FROM Roles, RoleRequirements, Skills "
-				+ "WHERE (Roles.RoleID = RoleRequirements.RoleID) AND (Skills.ID = RoleRequirements.SkillID) AND RoleRequirements.ProID ='"
-				+ projectID + "';";
-		boolean alreadyAdded = false;
-
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-
-			while (rs.next()) {
-				Role role = Role.valueOf(rs.getString("RoleType"));
-				for (int i = 0; i < roles.size(); i++) {
-					if (roles.get(i).getRole() == role) {
-						roles.get(i).addSkill(Skill.valueOf(rs.getString("name")));
-						alreadyAdded = true;
-					}
-				}
-				if (!alreadyAdded) {
-					roles.add(new RoleRequirement(role, skills));
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return roles;
-	}
+	
 
 	@Override
 	public Collection<Project> getAllProjects() {
@@ -297,26 +203,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		return students;
 	}
 
-	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
-		List<String> projectIds = new ArrayList<>();
-		String query = String.format(
-				"SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT %d;",
-				idealNumberOfProject);
-
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-
-			while (rs.next()) {
-				projectIds.add(rs.getString(1));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return projectIds;
-	}
-
 	@Override
 	public Collection<Project> getPopularProjects(int idealNumberOfProjects) {
 		Collection<Project> projects = new ArrayList<>();
@@ -331,10 +217,10 @@ public class SQLConnectionImpl implements SQLConnection {
 				ResultSet rs = state.executeQuery(query);
 
 				if (rs.next()) {
-					int projectIntId = rs.getInt(1);
-					Collection<RoleRequirement> roles = getRoleRequirements(projectIntId);
+					String projectIntId = rs.getString("ProID");
+					Collection<RoleRequirement> roles = getRequirements(projectIntId);
 					
-					project = new ProjectImpl(rs.getString("Desc"), String.valueOf(projectIntId), roles);
+					project = new ProjectImpl(rs.getString("Desc"), projectIntId, roles);
 					Collection<String> studentIds = getMembers(projectIntId);
 					for (String studentId : studentIds) {
 						Student member = getStudent(studentId);
@@ -351,67 +237,6 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 
 		return projects;
-	}
-
-	private Collection<RoleRequirement> getRoleRequirements(int projectId) {
-		Collection<RoleRequirement> roles = new ArrayList<>();
-		String query = String.format("SELECT RoleId FROM RoleRequirements WHERE ProID = %d;", projectId);
-
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-
-			while (rs.next()) {
-				int roleId = rs.getInt(1);
-				Role role = Role.getRole(roleId);
-				Collection<Skill> skills = getSkills(projectId, roleId);
-				roles.add(new RoleRequirement(role, skills));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return roles;
-	}
-
-	private Collection<Skill> getSkills(int projectId, int roleId) {
-		Collection<Skill> skills = new ArrayList<>();
-		String query = String.format("SELECT SkillID FROM RoleRequirements WHERE ProID = %d AND RoleID = %d;",
-				projectId, roleId);
-
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-
-			while (rs.next()) {
-				int skillId = rs.getInt(1);
-				Skill skill = Skill.getSkill(skillId);
-				skills.add(skill);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return skills;
-	}
-
-	private Collection<String> getMembers(int projectId) {
-		Collection<String> memberIds = new ArrayList<>();
-		String query = String.format("SELECT StuID FROM Teams WHERE ProID = %d;", projectId);
-
-		try {
-			Statement state = conn.createStatement();
-			ResultSet rs = state.executeQuery(query);
-
-			while (rs.next()) {
-				String stuId = rs.getString(1);
-				memberIds.add(stuId);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return memberIds;
 	}
 
 	@Override
@@ -446,7 +271,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	public void insertProject(Project project) {
 		String query = "INSERT INTO Project (Desc) VALUES (?);";
 		PreparedStatement prep;
-		int projectId;
+		String projectId;
 
 		try {
 			prep = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -455,38 +280,13 @@ public class SQLConnectionImpl implements SQLConnection {
 
 			ResultSet generatedKeys = prep.getGeneratedKeys();
 			if (generatedKeys.next()) {
-				long lastId = generatedKeys.getLong(1);
-				projectId = Long.valueOf(lastId).intValue();
+				projectId = generatedKeys.getString(1);
 				if (project.getRoleRequirements().size() > 0) {
 					insertRoleRequirement(projectId, project.getRoleRequirements());
 				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-	}
-
-	private void insertRoleRequirement(int projectId, Collection<RoleRequirement> reqs) {
-		String query = "INSERT INTO RoleRequirements (ProID, RoleID, SkillID) VALUES (?, ?, ?);";
-		PreparedStatement prep;
-
-		for (RoleRequirement req : reqs) {
-			Role role = req.getRole();
-			int roleId = role.getId();
-			Collection<Skill> skills = req.getSkills();
-
-			for (Skill skill : skills) {
-				int skillId = skill.getId();
-				try {
-					prep = conn.prepareStatement(query);
-					prep.setInt(1, projectId);
-					prep.setInt(2, roleId);
-					prep.setInt(3, skillId);
-					prep.execute();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 
@@ -558,24 +358,146 @@ public class SQLConnectionImpl implements SQLConnection {
 		}
 	}
 
-	private PersonalityType toPersonalityType(String personalityType) {
+	private Student createStudent(ResultSet rs) throws SQLException {
+		List<RoleRequirement> rolePreferences = new ArrayList<RoleRequirement>();
+		List<Student> blacklist = new ArrayList<Student>();
+		List<Project> projectPreferences = (List<Project>) getProjectPreferences(rs.getString(STUDENT_ID));
 
-		for (PersonalityType p : PersonalityType.values()) {
-			if (p.toString().equalsIgnoreCase(personalityType)) {
-				return p;
-			}
+		Student student = new StudentImpl(rs.getString(NAME), rs.getString(STUDENT_ID),
+				PersonalityType.valueOf(rs.getString(PERSONALITY_TYPE)), Gender.valueOf(rs.getString(GENDER)),
+				rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA), projectPreferences, rolePreferences, blacklist);
+
+		return student;
+	}
+	
+	private Collection<Project> getProjectPreferences(String StuID) {
+		String query = "SELECT * FROM Student_Project WHERE " + STUDENT_ID + " = '" + StuID + "';";
+		ArrayList<Project> projects = new ArrayList<Project>();
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			projects.add(getProjectByID(rs.getString("ProID1")));
+			projects.add(getProjectByID(rs.getString("ProID2")));
+			projects.add(getProjectByID(rs.getString("ProID3")));
+			projects.add(getProjectByID(rs.getString("ProID4")));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		return null;
+
+		return projects;
 	}
 
-	private Gender toGender(String gender) {
+	private Project getProjectByID(String projectID) {
+		Project project = null;
+		String query = "select * from Project where ProID ='" + projectID + "';'";
 
-		for (Gender p : Gender.values()) {
-			if (p.toString().equalsIgnoreCase(gender)) {
-				return p;
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+			project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), getRequirements(projectID));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return project;
+	}
+
+	private Collection<RoleRequirement> getRequirements(String projectID) {
+		ArrayList<RoleRequirement> roles = new ArrayList<RoleRequirement>();
+		ArrayList<Skill> skills = new ArrayList<Skill>();
+		String query = "SELECT Roles.RoleType, Skills.Name FROM Roles, RoleRequirements, Skills "
+				+ "WHERE (Roles.RoleID = RoleRequirements.RoleID) AND (Skills.ID = RoleRequirements.SkillID) AND RoleRequirements.ProID ='"
+				+ projectID + "';";
+		boolean alreadyAdded = false;
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				Role role = Role.valueOf(rs.getString("RoleType"));
+				for (int i = 0; i < roles.size(); i++) {
+					if (roles.get(i).getRole() == role) {
+						roles.get(i).addSkill(Skill.valueOf(rs.getString("name")));
+						alreadyAdded = true;
+					}
+				}
+				if (!alreadyAdded) {
+					roles.add(new RoleRequirement(role, skills));
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return roles;
+	}
+	
+	
+	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
+		List<String> projectIds = new ArrayList<>();
+		String query = String.format(
+				"SELECT ProID, SUM(Weight) AS Weight FROM Preferences GROUP BY ProID ORDER BY Weight DESC LIMIT %d;",
+				idealNumberOfProject);
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				projectIds.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return projectIds;
+	}
+	
+	private Collection<String> getMembers(String projectId) {
+		Collection<String> memberIds = new ArrayList<>();
+		String query = String.format("SELECT StuID FROM Teams WHERE ProID = %s", projectId);
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+
+			while (rs.next()) {
+				String stuId = rs.getString(1);
+				memberIds.add(stuId);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return memberIds;
+	}
+	
+	private void insertRoleRequirement(String projectId, Collection<RoleRequirement> reqs) {
+		String query = "INSERT INTO RoleRequirements (ProID, RoleID, SkillID) VALUES (?, ?, ?);";
+		PreparedStatement prep;
+
+		for (RoleRequirement req : reqs) {
+			Role role = req.getRole();
+			int roleId = role.getId();
+			Collection<Skill> skills = req.getSkills();
+
+			for (Skill skill : skills) {
+				int skillId = skill.getId();
+				try {
+					prep = conn.prepareStatement(query);
+					prep.setString(1, projectId);
+					prep.setInt(2, roleId);
+					prep.setInt(3, skillId);
+					prep.execute();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		return null;
 	}
 
 	// INSERT INTO Student (Gender,PT, WorkExp, GPA,Role, name) VALUES ("MALE",'2',
