@@ -149,7 +149,6 @@ public class Menu {
 						system.confirmTeams();
 						System.out.println("Teams Confirmed.");
 					}
-
 				} catch (InsufficientProjectsException e) {
 					System.out.println(
 							"There were not enough projects to assign each student a team! Team Formation Failed.");
@@ -159,10 +158,15 @@ public class Menu {
 					e.printStackTrace();
 				}
 				
-
 				break;
 			case "4":
-				system.getProjectMembers().forEach(s -> {
+				Collection<String> strProjects = system.getProjectInString();
+				if (strProjects.isEmpty()) {
+					System.out.println("Error: No team exists.");
+					break;
+				}
+				
+				system.getProjectInString().forEach(s -> {
 					System.out.println(s);
 				});
 				
@@ -179,7 +183,6 @@ public class Menu {
 				} else {
 					System.out.println("Swap failure");
 				}
-								
 				break;
 			case "5":
 				user = "exit";

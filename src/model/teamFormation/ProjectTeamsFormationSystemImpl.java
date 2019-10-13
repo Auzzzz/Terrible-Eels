@@ -143,16 +143,20 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 	
 	@Override
-	public Collection<String> getProjectMembers() {
+	public Collection<String> getProjectInString() {
 		Collection<String> strProjects = new ArrayList<>();
 		Collection<Project> formedProjects;
 		try {
 			formedProjects = engine.getPopularProjects();
 			
 			for (Project project : formedProjects) {
-				int fitVal = engine.getFitnessValue(project);
-				String strProject = convertTeamToString(project, fitVal);
-				strProjects.add(strProject);
+				Collection<Student> members = project.getStudents();
+				
+				if (!members.isEmpty()) {
+					int fitVal = engine.getFitnessValue(project);
+					String strProject = convertTeamToString(project, fitVal);
+					strProjects.add(strProject);
+				}
 			}
 		} catch (InsufficientStudentsException e) {
 			e.printStackTrace();
