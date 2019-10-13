@@ -107,5 +107,5 @@ public interface ProjectTeamsFormationSystem {
 	/**
 	 * @return - Collection of project information in string format
 	 */
-	Collection<String> getProjectInString();
+	Collection<String> getPopularProjectsInString();
 }

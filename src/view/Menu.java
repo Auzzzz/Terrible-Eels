@@ -189,13 +189,13 @@ public class Menu {
 				system.updateConstraints(constraints);
 				break;
 			case "5":
-				Collection<String> strProjects = system.getProjectInString();
+				Collection<String> strProjects = system.getPopularProjectsInString();
 				if (strProjects.isEmpty()) {
 					System.out.println("Error: No team exists.");
 					break;
 				}
 				
-				system.getProjectInString().forEach(s -> {
+				strProjects.forEach(s -> {
 					System.out.println(s);
 				});
 				

@@ -149,7 +149,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 	}
 
 	@Override
-	public Collection<String> getProjectInString() {
+	public Collection<String> getPopularProjectsInString() {
 		Collection<String> strProjects = new ArrayList<>();
 		Collection<Project> formedProjects;
 		try {
