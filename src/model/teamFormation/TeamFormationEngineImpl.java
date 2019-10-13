@@ -557,7 +557,6 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		Collection<Project> candidateProjects = getPopularProjects();
 		for (Project project : candidateProjects) {
 			project.resetStudents();
-			connection.saveProject(project);
 		}
 
 		List<Student> female = new LinkedList<>(connection.getFemaleStudents());
