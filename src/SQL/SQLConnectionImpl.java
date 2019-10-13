@@ -416,16 +416,27 @@ public class SQLConnectionImpl implements SQLConnection {
 
 	@Override
 	public void saveProject(Project project) {
-		String query = "SELECT StuID from Student WHERE Gender = 'F';";
-
+		Collection<Student> members = project.getStudents();
+		int projectIntId = Integer.parseInt(project.getId());
+		PreparedStatement prep;
+		String query = String.format("DELETE FROM Teams WHERE ProId = %d;", projectIntId);
+		
 		try {
-			Statement state = conn.createStatement();
-			state.executeQuery(query);
-
+			prep = conn.prepareStatement(query);
+			prep.execute();
+			
+			query = "INSERT INTO Teams (ProID, StuID) VALUES (?, ?);";
+			
+			for (Student member : members) {
+				prep = conn.prepareStatement(query);
+				prep.setInt(1, projectIntId);
+				prep.setString(2, member.getStudentNo());
+				prep.execute();
+			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override

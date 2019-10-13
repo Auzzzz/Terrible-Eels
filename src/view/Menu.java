@@ -142,6 +142,14 @@ public class Menu {
 					system.formTeams().forEach(s -> {
 						System.out.println(s);
 					});
+					
+					System.out.println("Do you want to confirm the teams? (y/n)");
+					input = scanner.nextLine();
+					if (input.equals("y") || input.equals("Y")) {
+						system.confirmTeams();
+						System.out.println("Teams Confirmed.");
+					}
+					
 				} catch (InsufficientProjectsException e) {
 					System.out.println(
 							"There were not enough projects to assign each student a team! Team Formation Failed.");
@@ -150,6 +158,8 @@ public class Menu {
 							"There were not enough students to assign a team to each project! Team Formation Failed.");
 					e.printStackTrace();
 				}
+				
+				
 
 				break;
 			case "4":
