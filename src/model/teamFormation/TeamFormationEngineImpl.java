@@ -9,7 +9,7 @@ import java.util.Random;
 
 import enums.Skill;
 import interfaces.Project;
-import interfaces.SQLConnection;
+import interfaces.DataStorage;
 import interfaces.Student;
 import interfaces.TeamFormationEngine;
 import interfaces.Validator;
@@ -18,11 +18,11 @@ import model.RoleRequirement;
 import model.constraints.SoftConstraint;
 
 public class TeamFormationEngineImpl implements TeamFormationEngine {
-	private SQLConnection connection;
+	private DataStorage connection;
 	private Validator validator;
 	private TeamFormationState state = null;
 	
-	public TeamFormationEngineImpl(SQLConnection connection) {
+	public TeamFormationEngineImpl(DataStorage connection) {
 		this.connection = connection;
 		this.validator = new ValidatorImpl(connection);
 	}

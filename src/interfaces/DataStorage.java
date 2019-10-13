@@ -3,7 +3,7 @@ package interfaces;
 import java.util.Collection;
 import model.constraints.SoftConstraint;
 
-public interface SQLConnection {
+public interface DataStorage {
 	int getStudentCount();
 	
 	int getProjectCount();

@@ -103,6 +103,9 @@ public class StudentImpl implements Student {
 		return this.experience;
 	}
 
-	
+	@Override
+	public Collection<Student> getBlacklist() {
+		return blacklist;
+	}
 
 }

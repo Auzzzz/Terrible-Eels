@@ -8,10 +8,10 @@ import model.ProjectImpl;
 import model.RoleRequirement;
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
-	private SQLConnection connection;
+	private DataStorage connection;
 	private TeamFormationEngine engine;
 
-	public ProjectTeamsFormationSystemImpl(SQLConnection connection) {
+	public ProjectTeamsFormationSystemImpl(DataStorage connection) {
 		this.connection = connection;
 		this.engine = new TeamFormationEngineImpl(connection);
 	}

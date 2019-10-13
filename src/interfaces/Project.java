@@ -46,12 +46,9 @@ public interface Project {
 	Collection<RoleRequirement> getRoleRequirements();
 
 	/**
-	 * @return - String that lists project ID, description and members
+	 * Removes any assigned students from the project
 	 */
+	void resetStudents();
+	
     String toString();
-    
-    /**
-     * reset members of the project
-     */
-    void resetStudents();
 }
