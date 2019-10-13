@@ -12,7 +12,7 @@ import model.teamFormation.InsufficientStudentsException;
 
 public class Menu {
 	private ProjectTeamsFormationSystem system;
-	
+
 	public Menu(ProjectTeamsFormationSystem system) {
 		this.system = system;
 	}
@@ -67,10 +67,10 @@ public class Menu {
 
 			switch (input) {
 			case "1":
-				ArrayList<String> projects = (ArrayList<String>) system.getPopularProjectDescs();
+				ArrayList<String> projects = (ArrayList<String>) system.getAllProjectDescs();
 
 				for (int i = 0; i < projects.size(); i++) {
-					System.out.println(i + " " + projects.get(i));
+					System.out.println(i+1 + " " + projects.get(i));
 				}
 				system.setPreferences(username, promptPreferences(projects, scanner));
 
@@ -142,14 +142,14 @@ public class Menu {
 					system.formTeams().forEach(s -> {
 						System.out.println(s);
 					});
-					
+
 					System.out.println("Do you want to confirm the teams? (y/n)");
 					input = scanner.nextLine();
 					if (input.equals("y") || input.equals("Y")) {
 						system.confirmTeams();
 						System.out.println("Teams Confirmed.");
 					}
-					
+
 				} catch (InsufficientProjectsException e) {
 					System.out.println(
 							"There were not enough projects to assign each student a team! Team Formation Failed.");
@@ -158,8 +158,6 @@ public class Menu {
 							"There were not enough students to assign a team to each project! Team Formation Failed.");
 					e.printStackTrace();
 				}
-				
-				
 
 				break;
 			case "4":
@@ -188,16 +186,16 @@ public class Menu {
 			for (roleIndex = 0; roleIndex < roles.length; roleIndex++) {
 				System.out.println((roleIndex + 1) + ". " + roles[roleIndex]);
 			}
-			System.out.println((roleIndex + 2) + ". No more roles to add");
+			System.out.println((roleIndex + 1) + ". No more roles to add");
 			response = scanner.nextInt();
-			if (response == roleIndex + 2) {
+			if (response == roleIndex + 1) {
 				role = null;
 				response = -1;
 			} else if (response > roles.length || response <= 0) {
 				System.out.println("Please enter a valid option");
 				response = -2;
 			} else {
-				role = roles[response];
+				role = roles[response - 1];
 			}
 
 			while (response > 0) {
@@ -205,10 +203,10 @@ public class Menu {
 				for (skillIndex = 0; skillIndex < skillsValues.length; skillIndex++) {
 					System.out.println((skillIndex + 1) + ". " + skillsValues[skillIndex]);
 				}
-				System.out.println((skillIndex + 2) + ". No more skills to add");
+				System.out.println((skillIndex + 1) + ". No more skills to add");
 				response = scanner.nextInt();
 
-				if (response == skillIndex + 2) {
+				if (response == skillIndex + 1) {
 					response = -2;
 				} else if (response > skillsValues.length || response <= 0) {
 					System.out.println("Please enter a valid option");
@@ -239,7 +237,6 @@ public class Menu {
 				preferences.add(descriptions.get(index));
 			}
 		}
-		scanner.next();
 
 		return preferences;
 	}

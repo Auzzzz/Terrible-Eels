@@ -337,7 +337,7 @@ public class SQLConnection implements DataStorage {
 	public Student getStudent(String studentNo) {
 
 		Student student = null;
-		String query = "SELECT * FROM Student WHERE StuID = " + studentNo + ";";
+		String query = "SELECT * FROM Student WHERE StuID = '" + studentNo + "';";
 
 		try {
 			Statement state = conn.createStatement();
