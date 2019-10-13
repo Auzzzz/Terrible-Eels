@@ -5,14 +5,14 @@ import java.util.Collection;
 
 import interfaces.Constraint;
 import interfaces.ConstraintRepository;
-import interfaces.SQLConnection;
+import interfaces.DataStorage;
 import model.constraints.*;
 
 public class ConstraintRepositoryImpl implements ConstraintRepository {
-	private SQLConnection db;
+	private DataStorage db;
 	private Collection<Constraint> hardConstraints;
 	
-	public ConstraintRepositoryImpl(SQLConnection db) {
+	public ConstraintRepositoryImpl(DataStorage db) {
 		this.db = db;
 		hardConstraints = Arrays.asList(new GPAConstraint("GPA Constraint"), new AverageGPAConstraint("Average GPA Constraint"), new GenderConstraint("Gender Constraint"));
 	}

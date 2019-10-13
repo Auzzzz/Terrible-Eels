@@ -10,14 +10,14 @@ import enums.PersonalityType;
 import enums.Role;
 import enums.Skill;
 import interfaces.Project;
-import interfaces.SQLConnection;
+import interfaces.DataStorage;
 import interfaces.Student;
 import model.ProjectImpl;
 import model.RoleRequirement;
 import model.StudentImpl;
 import model.constraints.*;
 
-public class SQLConnectionImpl implements SQLConnection {
+public class SQLConnection implements DataStorage {
 	private static Connection conn = null;
 	private final String STUDENT_ID = "StuID";
 	private final String GENDER = "gender";
@@ -26,7 +26,7 @@ public class SQLConnectionImpl implements SQLConnection {
 	private final String GPA = "GPA";
 	private final String NAME = "Name";
 
-	public SQLConnectionImpl() {
+	public SQLConnection() {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection("jdbc:sqlite:db/SEF.db");

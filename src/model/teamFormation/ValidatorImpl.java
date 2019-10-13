@@ -10,7 +10,7 @@ import model.constraints.SoftConstraint;
 public class ValidatorImpl implements Validator {
 	private ConstraintRepository repo;
 
-	public ValidatorImpl(SQLConnection connection) {
+	public ValidatorImpl(DataStorage connection) {
 		this.repo = new ConstraintRepositoryImpl(connection);
 	}
 
