@@ -127,7 +127,7 @@ public class Menu {
 			System.out.println("Press 5 to Swap Teams");
 			System.out.println("Press 6 to exit");
 			System.out.println("*******************************************");
-
+			
 			input = scanner.nextLine();
 
 			switch (input) {
@@ -204,7 +204,7 @@ public class Menu {
 				System.out.println("Enter second member to swap: ");
 				String s2 = scanner.nextLine();
 				System.out.println("Enter acceptable fitness value change: ");
-				int acceptableChange = scanner.nextInt();
+				int acceptableChange = Integer.parseInt(scanner.nextLine());
 				
 				// if successful swap
 				if (system.swap(s1, s2, acceptableChange)) {
