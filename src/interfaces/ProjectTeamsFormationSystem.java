@@ -89,4 +89,6 @@ public interface ProjectTeamsFormationSystem {
 	 * @return
 	 */
 	boolean checkStudentNum(String studentNo);
+	
+	Collection<String> getProjectMembers();
 }

@@ -88,7 +88,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		builder.append("Description: " + project.getProjectDesc()).append('\n');
 		builder.append("Students: \n");
 		project.getStudents().forEach( s -> {
-			builder.append("-" + s.getName() + ", " + s.getGender() + ", GPA: " + s.getGpa() + ", Personality Type:" + s.getPersonalityType() + "\n");
+			builder.append("-" + s.getStudentNo() + ", " + s.getName() + ", " + s.getGender() + ", GPA: " + s.getGpa() + ", Personality Type:" + s.getPersonalityType() + "\n");
 		});
 		builder.append("Fitness Value:" ).append(fitVal).append('\n');
 		
@@ -141,5 +141,23 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			return false;
 		}
 	}
-
+	
+	@Override
+	public Collection<String> getProjectMembers() {
+		Collection<String> strProjects = new ArrayList<>();
+		Collection<Project> formedProjects;
+		try {
+			formedProjects = engine.getPopularProjects();
+			
+			for (Project project : formedProjects) {
+				int fitVal = engine.getFitnessValue(project);
+				String strProject = convertTeamToString(project, fitVal);
+				strProjects.add(strProject);
+			}
+		} catch (InsufficientStudentsException e) {
+			e.printStackTrace();
+		}
+		
+		return strProjects;
+	}
 }

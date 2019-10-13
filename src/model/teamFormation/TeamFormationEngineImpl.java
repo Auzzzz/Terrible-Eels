@@ -77,25 +77,27 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 		Student s2 = connection.getStudent(sNo2);
 		Project p1 = connection.getProjectByStudentNo(sNo1);	// s1's original project	
 		Project p2 = connection.getProjectByStudentNo(sNo2);	// s2's original project	
-
-		// if s1 and s2 are from different projects
-		if (!((p1.getId()).equals(p2.getId()))) {
-			// temporary projects after students are swapped
-			Project p1Temp = createTemporaryTeam(s1, s2);	// s1's team members + s2
-			Project p2Temp = createTemporaryTeam(s2, s1);	// s2's team members + s1
-			
-			// if the change is within acceptable value
-			int p1FitChange = getFitDifference(p1, p1Temp);
-			int p2FitChange = getFitDifference(p2, p2Temp);
-			if ((p1FitChange <= acceptableChange) && (p2FitChange <= acceptableChange)) {
-				p1.removeStudent(s1);
-				p1.addStudent(s2);
-				p2.removeStudent(s2);
-				p2.addStudent(s1);
-				connection.saveProject(p1);
-				connection.saveProject(p2);
+		
+		if (p1 != null && p2 != null) {
+			// if s1 and s2 are from different projects
+			if (!((p1.getId()).equals(p2.getId()))) {
+				// temporary projects after students are swapped
+				Project p1Temp = createTemporaryTeam(s1, s2);	// s1's team members + s2
+				Project p2Temp = createTemporaryTeam(s2, s1);	// s2's team members + s1
 				
-				return true;
+				// if the change is within acceptable value
+				int p1FitChange = getFitDifference(p1, p1Temp);
+				int p2FitChange = getFitDifference(p2, p2Temp);
+				if ((p1FitChange <= acceptableChange) && (p2FitChange <= acceptableChange)) {
+					p1.removeStudent(s1);
+					p1.addStudent(s2);
+					p2.removeStudent(s2);
+					p2.addStudent(s1);
+					connection.saveProject(p1);
+					connection.saveProject(p2);
+					
+					return true;
+				}
 			}
 		}
 		

@@ -122,7 +122,8 @@ public class Menu {
 			System.out.println("Press 1 to Display All Projects ");
 			System.out.println("Press 2 to Display Popular Projects ");
 			System.out.println("Press 3 to Form Teams");
-			System.out.println("Press 4 to exit");
+			System.out.println("Press 4 to Swap Members");
+			System.out.println("Press 5 to exit");
 			System.out.println("*******************************************");
 
 			input = scanner.nextLine();
@@ -136,7 +137,6 @@ public class Menu {
 				Collection<String> popularDescs = system.getPopularProjectDescs();
 				popularDescs.forEach(System.out::println);
 				break;
-
 			case "3":
 				try {
 					system.formTeams().forEach(s -> {
@@ -149,7 +149,6 @@ public class Menu {
 						system.confirmTeams();
 						System.out.println("Teams Confirmed.");
 					}
-					
 				} catch (InsufficientProjectsException e) {
 					System.out.println(
 							"There were not enough projects to assign each student a team! Team Formation Failed.");
@@ -159,10 +158,28 @@ public class Menu {
 					e.printStackTrace();
 				}
 				
-				
-
 				break;
 			case "4":
+				system.getProjectMembers().forEach(s -> {
+					System.out.println(s);
+				});
+				
+				System.out.println("Enter first member to swap: ");
+				String s1 = scanner.nextLine();
+				System.out.println("Enter second member to swap: ");
+				String s2 = scanner.nextLine();
+				System.out.println("Enter acceptable fitness value change: ");
+				int acceptableChange = scanner.nextInt();
+				
+				// if successful swap
+				if (system.swap(s1, s2, acceptableChange)) {
+					System.out.println("Successfully swapped.");
+				} else {
+					System.out.println("Swap failure");
+				}
+								
+				break;
+			case "5":
 				user = "exit";
 				break;
 			default:
@@ -170,7 +187,6 @@ public class Menu {
 				break;
 			}
 		}
-
 	}
 
 	private Collection<RoleRequirement> promptRoles(Scanner scanner) {
