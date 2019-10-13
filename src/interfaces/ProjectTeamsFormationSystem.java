@@ -97,11 +97,15 @@ public interface ProjectTeamsFormationSystem {
 	Collection<SoftConstraint> getSoftConstraints();
 
 	/**
-	 * Sets the weight of all soft constraints to be equal to the
-	 * weights of each constraint in the given collection
+	 * Sets the weight of all soft constraints to be equal to the weights of each
+	 * constraint in the given collection
 	 * 
 	 * @param constraints
 	 */
 	void updateConstraints(Collection<SoftConstraint> constraints);
 
+	/**
+	 * @return - Collection of project information in string format
+	 */
+	Collection<String> getProjectInString();
 }

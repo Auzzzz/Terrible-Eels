@@ -50,5 +50,8 @@ public interface Project {
 	 */
 	void resetStudents();
 	
+	/**
+	 * @return - String that lists project ID, description and members
+	 */
     String toString();
 }

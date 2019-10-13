@@ -139,7 +139,6 @@ public class Menu {
 				Collection<String> popularDescs = system.getPopularProjectDescs();
 				popularDescs.forEach(System.out::println);
 				break;
-
 			case "3":
 				try {
 					system.formTeams().forEach(s -> {
@@ -152,7 +151,6 @@ public class Menu {
 						system.confirmTeams();
 						System.out.println("Teams Confirmed.");
 					}
-
 				} catch (InsufficientProjectsException e) {
 					System.out.println(
 							"There were not enough projects to assign each student a team! Team Formation Failed.");
@@ -161,7 +159,7 @@ public class Menu {
 							"There were not enough students to assign a team to each project! Team Formation Failed.");
 					e.printStackTrace();
 				}
-
+				
 				break;
 			case "4":
 				ArrayList<SoftConstraint> constraints = (ArrayList<SoftConstraint>) system.getSoftConstraints();
@@ -191,21 +189,29 @@ public class Menu {
 				system.updateConstraints(constraints);
 				break;
 			case "5":
-				String s1;
-				String s2;
-				int change;
-
-				System.out.println("Please enter the student number of the first student you wish to swap");
-				s1 = scanner.nextLine();
-
-				System.out.println("Please enter the student number of the first student you wish to swap");
-				s2 = scanner.nextLine();
-
-				System.out.println("Please enter the acceptable change in fitness");
-				change = scanner.nextInt();
-
-				system.swap(s1, s2, change);
-
+				Collection<String> strProjects = system.getProjectInString();
+				if (strProjects.isEmpty()) {
+					System.out.println("Error: No team exists.");
+					break;
+				}
+				
+				system.getProjectInString().forEach(s -> {
+					System.out.println(s);
+				});
+				
+				System.out.println("Enter first member to swap: ");
+				String s1 = scanner.nextLine();
+				System.out.println("Enter second member to swap: ");
+				String s2 = scanner.nextLine();
+				System.out.println("Enter acceptable fitness value change: ");
+				int acceptableChange = scanner.nextInt();
+				
+				// if successful swap
+				if (system.swap(s1, s2, acceptableChange)) {
+					System.out.println("Successfully swapped.");
+				} else {
+					System.out.println("Swap failure");
+				}
 				break;
 			case "6":
 				user = "exit";
@@ -215,7 +221,6 @@ public class Menu {
 				break;
 			}
 		}
-
 	}
 
 	private Collection<RoleRequirement> promptRoles(Scanner scanner) {

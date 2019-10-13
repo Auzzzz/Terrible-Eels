@@ -89,13 +89,15 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		StringBuilder builder = new StringBuilder();
 		builder.append("Description: " + project.getProjectDesc()).append('\n');
 		builder.append("Students: \n");
+
 		project.getStudents().forEach(s -> {
-			builder.append("-" + s.getName() + ", " + s.getGender() + ", GPA: " + s.getGpa() + ", Personality Type:"
-					+ s.getPersonalityType() + "\n");
+			builder.append("-" + s.getStudentNo() + ", " + s.getName() + ", " + s.getGender() + ", GPA: " + s.getGpa()
+					+ ", Personality Type:" + s.getPersonalityType() + "\n");
 		});
 		builder.append("Fitness Value:").append(fitVal).append('\n');
 
 		return builder.toString();
+
 	}
 
 	@Override
@@ -144,6 +146,29 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public Collection<String> getProjectInString() {
+		Collection<String> strProjects = new ArrayList<>();
+		Collection<Project> formedProjects;
+		try {
+			formedProjects = engine.getPopularProjects();
+
+			for (Project project : formedProjects) {
+				Collection<Student> members = project.getStudents();
+
+				if (!members.isEmpty()) {
+					int fitVal = engine.getFitnessValue(project);
+					String strProject = convertTeamToString(project, fitVal);
+					strProjects.add(strProject);
+				}
+			}
+		} catch (InsufficientStudentsException e) {
+			e.printStackTrace();
+		}
+
+		return strProjects;
 	}
 
 	@Override
