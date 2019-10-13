@@ -546,6 +546,10 @@ public class TeamFormationEngineImpl implements TeamFormationEngine {
 	@Override
 	public Collection<Project> formTeams() throws InsufficientProjectsException, InsufficientStudentsException, RemainedStudentsException {
 		Collection<Project> candidateProjects = getPopularProjects();
+		for (Project project : candidateProjects) {
+			project.resetStudents();
+		}
+		
 		List<Student> female = new LinkedList<>(connection.getFemaleStudents());
 		List<Student> other = new LinkedList<>(connection.getMaleStudents());
 		other.addAll(connection.getOtherStudents());

@@ -58,7 +58,12 @@ public class ProjectImpl implements Project {
 	public Collection<RoleRequirement> getRoleRequirements() {
 		return rolesReq;
 	}
-
+	
+	@Override
+	public void resetStudents() {
+		students.clear();
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
