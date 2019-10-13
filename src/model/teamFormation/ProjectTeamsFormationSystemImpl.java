@@ -6,6 +6,7 @@ import java.util.Collection;
 import interfaces.*;
 import model.ProjectImpl;
 import model.RoleRequirement;
+import model.constraints.SoftConstraint;
 
 public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSystem {
 	private DataStorage connection;
@@ -53,45 +54,47 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		Collection<String> results = new ArrayList<>();
 		Collection<Project> formedProjects;
 		Collection<Student> remainedStudents = new ArrayList<>();
-		
+
 		try {
 			formedProjects = engine.formTeams();
-			
+
 		} catch (RemainedStudentsException e) {
 			formedProjects = e.getFormedProjects();
 			remainedStudents = e.getRemainedStudents();
 		}
-		
+
 		for (Project project : formedProjects) {
 			int fitVal = engine.getFitnessValue(project);
 			String str = convertTeamToString(project, fitVal);
 			results.add(str);
 		}
-		
-		// if RemainedStudentsException was thrown, show remaining students as well after formed projects
+
+		// if RemainedStudentsException was thrown, show remaining students as well
+		// after formed projects
 		if (!remainedStudents.isEmpty()) {
 			StringBuilder builder = new StringBuilder();
 			builder.append("Remaining Students: \n");
-			
+
 			for (Student student : remainedStudents) {
 				builder.append(student.getStudentNo()).append('\n');
 			}
-			
+
 			results.add(builder.toString());
 		}
-		
+
 		return results;
 	}
-	
+
 	private String convertTeamToString(Project project, int fitVal) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Description: " + project.getProjectDesc()).append('\n');
 		builder.append("Students: \n");
-		project.getStudents().forEach( s -> {
-			builder.append("-" + s.getName() + ", " + s.getGender() + ", GPA: " + s.getGpa() + ", Personality Type:" + s.getPersonalityType() + "\n");
+		project.getStudents().forEach(s -> {
+			builder.append("-" + s.getName() + ", " + s.getGender() + ", GPA: " + s.getGpa() + ", Personality Type:"
+					+ s.getPersonalityType() + "\n");
 		});
-		builder.append("Fitness Value:" ).append(fitVal).append('\n');
-		
+		builder.append("Fitness Value:").append(fitVal).append('\n');
+
 		return builder.toString();
 	}
 
@@ -108,12 +111,13 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 
 	@Override
 	public void setPreferences(String studentID, Collection<String> projectIDs) {
-		Student student = connection.getStudent(studentID); 
+		Student student = connection.getStudent(studentID);
 		ArrayList<Project> projects = new ArrayList<Project>();
 		projectIDs.forEach(p -> {
 			projects.add(connection.getProjectByDesc(p));
 		});
 		student.setPreferences(projects);
+		connection.updateStudent(student);
 	}
 
 	@Override
@@ -122,7 +126,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 		Student blacklister = connection.getStudent(studentID);
 		Student blacklistee = connection.getStudent(blacklistID);
 		blacklister.addBlacklist(blacklistee);
-
+		connection.updateStudent(blacklister);
 	}
 
 	@Override
@@ -130,7 +134,7 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 
 		Student student = connection.getStudent(studentID);
 		student.setRolePreferences(roles);
-
+		connection.updateStudent(student);
 	}
 
 	@Override
@@ -139,6 +143,18 @@ public class ProjectTeamsFormationSystemImpl implements ProjectTeamsFormationSys
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	@Override
+	public Collection<SoftConstraint> getSoftConstraints() {
+		return connection.getAllSoftConstraints();
+	}
+
+	@Override
+	public void updateConstraints(Collection<SoftConstraint> constraints) {
+		for (SoftConstraint sc : constraints) {
+			connection.saveConstraint(sc.getDescription(), sc.getWeight());
 		}
 	}
 

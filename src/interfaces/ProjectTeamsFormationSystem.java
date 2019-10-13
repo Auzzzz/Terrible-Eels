@@ -3,6 +3,7 @@ package interfaces;
 import java.util.Collection;
 
 import model.RoleRequirement;
+import model.constraints.SoftConstraint;
 import model.teamFormation.InsufficientProjectsException;
 import model.teamFormation.InsufficientStudentsException;
 import model.teamFormation.RemainedStudentsException;
@@ -33,7 +34,6 @@ public interface ProjectTeamsFormationSystem {
 	 */
 	boolean swap(String s1, String s2, int acceptableChange);
 
-	
 	/**
 	 * form teams by assigning students into projects
 	 * 
@@ -42,8 +42,7 @@ public interface ProjectTeamsFormationSystem {
 	 * @throws InsufficientProjectsException
 	 * @throws RemainedStudentsException
 	 */
-	Collection<String> formTeams()
-			throws InsufficientProjectsException, InsufficientStudentsException;
+	Collection<String> formTeams() throws InsufficientProjectsException, InsufficientStudentsException;
 
 	/**
 	 * save all formed projects
@@ -89,4 +88,20 @@ public interface ProjectTeamsFormationSystem {
 	 * @return
 	 */
 	boolean checkStudentNum(String studentNo);
+
+	/**
+	 * Gets all of the soft constraints stored in the system
+	 * 
+	 * @return
+	 */
+	Collection<SoftConstraint> getSoftConstraints();
+
+	/**
+	 * Sets the weight of all soft constraints to be equal to the
+	 * weights of each constraint in the given collection
+	 * 
+	 * @param constraints
+	 */
+	void updateConstraints(Collection<SoftConstraint> constraints);
+
 }

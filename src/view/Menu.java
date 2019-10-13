@@ -7,6 +7,7 @@ import enums.Role;
 import enums.Skill;
 import interfaces.ProjectTeamsFormationSystem;
 import model.RoleRequirement;
+import model.constraints.SoftConstraint;
 import model.teamFormation.InsufficientProjectsException;
 import model.teamFormation.InsufficientStudentsException;
 
@@ -70,7 +71,7 @@ public class Menu {
 				ArrayList<String> projects = (ArrayList<String>) system.getAllProjectDescs();
 
 				for (int i = 0; i < projects.size(); i++) {
-					System.out.println(i+1 + " " + projects.get(i));
+					System.out.println(i + 1 + " " + projects.get(i));
 				}
 				system.setPreferences(username, promptPreferences(projects, scanner));
 
@@ -122,7 +123,9 @@ public class Menu {
 			System.out.println("Press 1 to Display All Projects ");
 			System.out.println("Press 2 to Display Popular Projects ");
 			System.out.println("Press 3 to Form Teams");
-			System.out.println("Press 4 to exit");
+			System.out.println("Press 4 to Change Soft Constraint Weights");
+			System.out.println("Press 5 to Swap Teams");
+			System.out.println("Press 6 to exit");
 			System.out.println("*******************************************");
 
 			input = scanner.nextLine();
@@ -161,6 +164,50 @@ public class Menu {
 
 				break;
 			case "4":
+				ArrayList<SoftConstraint> constraints = (ArrayList<SoftConstraint>) system.getSoftConstraints();
+				String repeat = "y";		
+			
+				while (repeat.equalsIgnoreCase("y")) {
+					
+					for (int i = 0; i < constraints.size(); i++) {
+						System.out.print(i + 1 + " " + constraints.get(i).getDescription() + "\t\t");
+						System.out.println(constraints.get(i).getWeight());
+					}
+					
+					
+					System.out.println("Please select the constraint whose weight you would like to change:");
+					int response = Integer.parseInt(scanner.nextLine())-1;
+
+					System.out.println("Please enter a new weight for this constraint (1-4):");
+					int weight = Integer.parseInt(scanner.nextLine());
+
+					constraints.get(response).setWeight(weight);	
+					
+					System.out.println("Continue altering constraint weights?(y/n)");
+					repeat = scanner.nextLine();
+					repeat = repeat.toLowerCase();
+				}
+				
+				system.updateConstraints(constraints);
+				break;
+			case "5":
+				String s1;
+				String s2;
+				int change;
+
+				System.out.println("Please enter the student number of the first student you wish to swap");
+				s1 = scanner.nextLine();
+
+				System.out.println("Please enter the student number of the first student you wish to swap");
+				s2 = scanner.nextLine();
+
+				System.out.println("Please enter the acceptable change in fitness");
+				change = scanner.nextInt();
+
+				system.swap(s1, s2, change);
+
+				break;
+			case "6":
 				user = "exit";
 				break;
 			default:

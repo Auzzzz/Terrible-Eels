@@ -46,6 +46,8 @@ public class SQLConnection implements DataStorage {
 			if (rs.next()) {
 				return rs.getInt(1);
 			}
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -64,6 +66,8 @@ public class SQLConnection implements DataStorage {
 			if (rs.next()) {
 				return rs.getInt(1);
 			}
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -84,14 +88,14 @@ public class SQLConnection implements DataStorage {
 				students.add(createStudent(rs));
 			}
 
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return students;
 	}
-
-	
 
 	@Override
 	public Collection<Project> getAllProjects() {
@@ -109,6 +113,9 @@ public class SQLConnection implements DataStorage {
 				projects.add(project);
 
 			}
+			
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -138,6 +145,9 @@ public class SQLConnection implements DataStorage {
 					break;
 				}
 			}
+			
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -156,7 +166,9 @@ public class SQLConnection implements DataStorage {
 			while (rs.next()) {
 				students.add(createStudent(rs));
 			}
-
+			
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -177,6 +189,8 @@ public class SQLConnection implements DataStorage {
 				students.add(createStudent(rs));
 			}
 
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -196,6 +210,8 @@ public class SQLConnection implements DataStorage {
 				students.add(createStudent(rs));
 			}
 
+			rs.close();
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -219,7 +235,7 @@ public class SQLConnection implements DataStorage {
 				if (rs.next()) {
 					String projectIntId = rs.getString("ProID");
 					Collection<RoleRequirement> roles = getRequirements(projectIntId);
-					
+
 					project = new ProjectImpl(rs.getString("Desc"), projectIntId, roles);
 					Collection<String> studentIds = getMembers(projectIntId);
 					for (String studentId : studentIds) {
@@ -227,6 +243,9 @@ public class SQLConnection implements DataStorage {
 						project.addStudent(member);
 					}
 				}
+				
+				rs.close();
+				state.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -241,36 +260,39 @@ public class SQLConnection implements DataStorage {
 
 	@Override
 	public void saveProject(Project project) {
-		Collection<Student> members = project.getStudents();
-		int projectIntId = Integer.parseInt(project.getId());
+		Collection<Student> students = project.getStudents();
+		deleteTeam(project.getId());
 		PreparedStatement prep;
-		String query = String.format("DELETE FROM Teams WHERE ProId = %d;", projectIntId);
-		
+		int teamID = getTeamID();
+
 		try {
-			prep = conn.prepareStatement(query);
-			prep.execute();
+			String query = "INSERT INTO Teams (TeamID, ProID, StuID) VALUES (?, ?, ?);";
 			
-			query = "INSERT INTO Teams (ProID, StuID) VALUES (?, ?);";
-			
-			for (Student member : members) {
+			for (Student member : students) {
 				prep = conn.prepareStatement(query);
-				prep.setInt(1, projectIntId);
-				prep.setString(2, member.getStudentNo());
+				prep.setInt(1, ++teamID);
+				prep.setInt(2, Integer.parseInt(project.getId()));
+				prep.setString(3, member.getStudentNo());
 				prep.execute();
+				prep.close();
 			}
+
+			
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	@Override
 	public void saveConstraint(String desc, int weight) {
-		String query = "INSERT INTO SoftConstraint (Desc, Weight) VALUES (" + desc + "," + weight + ");";
+		String query = "UPDATE SoftConstraint SET Weight = '" + weight + "' WHERE Desc = '" + desc + "' ;";
 
 		try {
-			Statement state = conn.createStatement();
-			state.executeQuery(query);
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.executeUpdate();
+			ps.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -296,6 +318,9 @@ public class SQLConnection implements DataStorage {
 					insertRoleRequirement(projectId, project.getRoleRequirements());
 				}
 			}
+			
+			prep.close();
+			generatedKeys.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -306,12 +331,18 @@ public class SQLConnection implements DataStorage {
 		// SELECT StuID, ProID FROM Teams WHERE StuID =' + studentNo + ';'
 		// SELECT * FROM Project WHERE ProID = 1;
 		Project pdsc = null;
-		String query = "select * from Project P where P.Desc ='" + studentNo + "';'";
+		String query = "select ProID from Teams where StuID ='" + studentNo + "';'";
 
 		try {
 			Statement state = conn.createStatement();
-			state.executeQuery(query);
+			ResultSet rs = state.executeQuery(query);
+			if (!rs.isClosed()) {
+				String projectID = rs.getString("ProID");
+				return getProjectByID(projectID);
+			}
 
+			state.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -326,7 +357,8 @@ public class SQLConnection implements DataStorage {
 		try {
 			Statement state = conn.createStatement();
 			state.executeQuery(query);
-
+			
+			state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -346,6 +378,9 @@ public class SQLConnection implements DataStorage {
 			if (rs.next()) {
 				student = createStudent(rs);
 			}
+			
+			state.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -372,28 +407,30 @@ public class SQLConnection implements DataStorage {
 	private Student createStudent(ResultSet rs) throws SQLException {
 		List<RoleRequirement> rolePreferences = new ArrayList<RoleRequirement>();
 		List<Student> blacklist = new ArrayList<Student>();
-		List<Project> projectPreferences = (List<Project>) getProjectPreferences(rs.getString(STUDENT_ID));
+		List<String> projectPreferences = (List<String>) getProjectPreferences(rs.getString(STUDENT_ID));
 
 		Student student = new StudentImpl(rs.getString(NAME), rs.getString(STUDENT_ID),
 				PersonalityType.valueOf(rs.getString(PERSONALITY_TYPE)), Gender.valueOf(rs.getString(GENDER)),
 				rs.getInt(WORK_EXPERIENCE), rs.getDouble(GPA), projectPreferences, rolePreferences, blacklist);
 
-		return student;
+		return student;	
 	}
-	
-	private Collection<Project> getProjectPreferences(String StuID) {
+
+	private Collection<String> getProjectPreferences(String StuID) {
 		String query = "SELECT * FROM Student_Project WHERE " + STUDENT_ID + " = '" + StuID + "';";
-		ArrayList<Project> projects = new ArrayList<Project>();
+		ArrayList<String> projects = new ArrayList<String>();
 
 		try {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
 
-			projects.add(getProjectByID(rs.getString("ProID1")));
-			projects.add(getProjectByID(rs.getString("ProID2")));
-			projects.add(getProjectByID(rs.getString("ProID3")));
-			projects.add(getProjectByID(rs.getString("ProID4")));
+			projects.add(rs.getString("ProID1"));
+			projects.add(rs.getString("ProID2"));
+			projects.add(rs.getString("ProID3"));
+			projects.add(rs.getString("ProID4"));
 
+			state.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -409,11 +446,34 @@ public class SQLConnection implements DataStorage {
 			Statement state = conn.createStatement();
 			ResultSet rs = state.executeQuery(query);
 			project = new ProjectImpl(rs.getString("Desc"), rs.getString("ProID"), getRequirements(projectID));
-
+			addStudents(project);
+			state.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return project;
+	}
+
+	private void addStudents(Project project) {
+		
+		String query = "SELECT StuID FROM Teams WHERE ProID = '" + project.getId() + "';";
+		
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+			
+			while(rs.next()) {
+				project.addStudent(getStudent(rs.getString("StuID")));
+			}
+			
+			state.close();
+			rs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	private Collection<RoleRequirement> getRequirements(String projectID) {
@@ -441,13 +501,14 @@ public class SQLConnection implements DataStorage {
 				}
 			}
 
+			state.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return roles;
 	}
-	
-	
+
 	private Collection<String> getPopularProjectIds(int idealNumberOfProject) {
 		List<String> projectIds = new ArrayList<>();
 		String query = String.format(
@@ -461,13 +522,16 @@ public class SQLConnection implements DataStorage {
 			while (rs.next()) {
 				projectIds.add(rs.getString(1));
 			}
+			
+			state.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return projectIds;
 	}
-	
+
 	private Collection<String> getMembers(String projectId) {
 		Collection<String> memberIds = new ArrayList<>();
 		String query = String.format("SELECT StuID FROM Teams WHERE ProID = %s", projectId);
@@ -480,13 +544,16 @@ public class SQLConnection implements DataStorage {
 				String stuId = rs.getString(1);
 				memberIds.add(stuId);
 			}
+			
+			state.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return memberIds;
 	}
-	
+
 	private void insertRoleRequirement(String projectId, Collection<RoleRequirement> reqs) {
 		String query = "INSERT INTO RoleRequirements (ProID, RoleID, SkillID) VALUES (?, ?, ?);";
 		PreparedStatement prep;
@@ -504,10 +571,42 @@ public class SQLConnection implements DataStorage {
 					prep.setInt(2, roleId);
 					prep.setInt(3, skillId);
 					prep.execute();
+					prep.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+	
+	private int getTeamID() {
+		int teamID = 0;
+		String query = "SELECT MAX(teamID) FROM Teams;";
+
+		try {
+			Statement state = conn.createStatement();
+			ResultSet rs = state.executeQuery(query);
+			
+			teamID = rs.getInt(1);
+			rs.close();
+			state.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return teamID;
+		
+	}
+	
+	private void deleteTeam(String id) {
+		String query = "DELETE FROM Teams WHERE ProID = '" + id + "';";
+		try {
+			PreparedStatement state = conn.prepareStatement(query);
+			state.execute();
+			state.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 
